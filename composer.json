@@ -1,0 +1,6 @@
+{
+    "name": "makehaven/makerspace_user_links",
+    "type": "drupal-custom-module",
+    "description": "Shared admin/staff link collector and service for member profile panels.",
+    "license": "GPL-2.0-or-later"
+}
