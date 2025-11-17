@@ -1,0 +1,7 @@
+name: 'Makerspace User Links'
+type: module
+description: 'Collects and groups admin/staff links for member profiles.'
+package: MakeHaven
+core_version_requirement: ^10
+dependencies:
+  - drupal:user

@@ -1,0 +1,6 @@
+services:
+  makerspace_user_links.link_manager:
+    class: Drupal\makerspace_user_links\Service\UserLinkManager
+    arguments:
+      - '@module_handler'
+      - '@string_translation'
