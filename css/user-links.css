@@ -1,0 +1,42 @@
+.makerspace-user-links__group {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.makerspace-user-links__group:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.makerspace-user-links__group-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: #5f6368;
+  margin-bottom: 0.35rem;
+}
+
+.makerspace-user-links__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.makerspace-user-links__item + .makerspace-user-links__item {
+  margin-top: 0.35rem;
+}
+
+.makerspace-user-links__item-title a {
+  font-weight: 600;
+}
+
+.makerspace-user-links__item-description {
+  font-size: 0.85rem;
+  color: #5f6368;
+}
+
+.makerspace-user-links__empty {
+  font-style: italic;
+  color: #7b7b7b;
+}

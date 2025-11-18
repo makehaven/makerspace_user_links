@@ -4,3 +4,37 @@
  * @file
  * Entry point for makerspace_user_links module.
  */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function makerspace_user_links_theme(): array {
+  return [
+    'makerspace_user_links_list' => [
+      'variables' => [
+        'link_groups' => [],
+      ],
+      'template' => 'makerspace-user-links-list',
+    ],
+  ];
+}
+
+/**
+ * Route helper to fetch the user from the current route.
+ *
+ * @deprecated
+ *   Most callers should inject the route-match service instead.
+ */
+function makerspace_user_links_route_user(RouteMatchInterface $route_match): ?UserInterface {
+  $route_user = $route_match->getParameter('user');
+  if ($route_user instanceof UserInterface) {
+    return $route_user;
+  }
+  if (is_numeric($route_user)) {
+    return \Drupal::entityTypeManager()->getStorage('user')->load((int) $route_user);
+  }
+  return NULL;
+}
