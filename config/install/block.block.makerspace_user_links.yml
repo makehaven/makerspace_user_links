@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - makerspace_user_links
+    - system
+  theme:
+    - barrio_boostrap_5_makehaven
+id: makerspace_user_links
+theme: barrio_boostrap_5_makehaven
+region: sidebar_second
+weight: -10
+provider: makerspace_user_links
+plugin: makerspace_user_links_block
+settings:
+  id: makerspace_user_links_block
+  label: 'Makerspace User Links'
+  label_display: visible
+  provider: makerspace_user_links
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: "/user/*
+/user"

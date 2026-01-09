@@ -47,27 +47,22 @@ class UserLinkManager {
     $links = [];
     $seen = [];
 
-    foreach ($link_sets as $set) {
-      if (!is_array($set)) {
+    foreach ($link_sets as $definition) {
+      if (!is_array($definition)) {
         continue;
       }
-      foreach ($set as $definition) {
-        if (!is_array($definition)) {
-          continue;
-        }
-        $normalized = $this->normalizeLinkDefinition($definition, $viewer);
-        if (!$normalized) {
-          continue;
-        }
-        $id = $normalized['id'] ?? NULL;
-        if ($id && isset($seen[$id])) {
-          continue;
-        }
-        if ($id) {
-          $seen[$id] = TRUE;
-        }
-        $links[] = $normalized;
+      $normalized = $this->normalizeLinkDefinition($definition, $viewer);
+      if (!$normalized) {
+        continue;
       }
+      $id = $normalized['id'] ?? NULL;
+      if ($id && isset($seen[$id])) {
+        continue;
+      }
+      if ($id) {
+        $seen[$id] = TRUE;
+      }
+      $links[] = $normalized;
     }
 
     $this->moduleHandler->alter('makerspace_user_links_links', $links, $account, $viewer);

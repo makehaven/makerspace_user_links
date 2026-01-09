@@ -7,6 +7,8 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\UserInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_theme().
@@ -20,6 +22,94 @@ function makerspace_user_links_theme(): array {
       'template' => 'makerspace-user-links-list',
     ],
   ];
+}
+
+/**
+ * Implements hook_makerspace_user_links_links().
+ */
+function makerspace_user_links_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer): array {
+  $links = [];
+  $route_parameters = ['user' => $account->id()];
+
+  // 1. Masquerade Link.
+  if ($viewer->hasPermission('masquerade as any user') && $account->id() != $viewer->id()) {
+    // Check if the masquerade module is enabled and route exists.
+    if (\Drupal::moduleHandler()->moduleExists('masquerade')) {
+      $links[] = [
+        'id' => 'masquerade',
+        'title' => t('Masquerade'),
+        'route_name' => 'entity.user.masquerade',
+        'route_parameters' => $route_parameters,
+        'category' => t('Admin Actions'),
+        'weight' => 10,
+        'description' => t('Switch to this user session.'),
+      ];
+    }
+  }
+
+  // 2. Add Badge (Badge Request).
+  if ($viewer->hasPermission('create badge_request content')) {
+    $links[] = [
+      'id' => 'add_badge',
+      'title' => t('Add Badge'),
+      'route_name' => 'node.add',
+      'route_parameters' => ['node_type' => 'badge_request'],
+      'route_options' => [
+        'query' => [
+          'edit' => [
+            'field_member_to_badge' => [
+              'widget' => [
+                0 => ['target_id' => $account->id()],
+              ],
+            ],
+          ],
+        ],
+      ],
+      'category' => t('Makerspace'),
+      'weight' => 20,
+      'description' => t('Manually assign a badge to this user.'),
+    ];
+  }
+
+  // 3. CiviCRM Contact Link.
+  if ($viewer->hasPermission('access CiviCRM') && \Drupal::moduleHandler()->moduleExists('civicrm')) {
+    try {
+      /** @var \Drupal\civicrm\Civicrm $civicrm_service */
+      $civicrm_service = \Drupal::service('civicrm');
+      if ($civicrm_service) {
+        $civicrm_service->initialize();
+        if (function_exists('civicrm_api3')) {
+          $result = civicrm_api3('UFMatch', 'get', [
+            'uf_id' => $account->id(),
+            'sequential' => 1,
+          ]);
+
+          if (!empty($result['values'][0]['contact_id'])) {
+            $contact_id = $result['values'][0]['contact_id'];
+            $links[] = [
+              'id' => 'civicrm_contact',
+              'title' => t('View CiviCRM Contact'),
+              'uri' => 'internal:/civicrm/contact/view',
+              'url_options' => [
+                'query' => [
+                  'reset' => 1,
+                  'cid' => $contact_id,
+                ],
+              ],
+              'category' => t('CiviCRM'),
+              'weight' => 0,
+              'description' => t('Open CiviCRM profile.'),
+            ];
+          }
+        }
+      }
+    }
+    catch (\Exception $e) {
+      \Drupal::logger('makerspace_user_links')->error('CiviCRM error: @msg', ['@msg' => $e->getMessage()]);
+    }
+  }
+
+  return $links;
 }
 
 /**
