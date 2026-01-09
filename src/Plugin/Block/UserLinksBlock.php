@@ -71,12 +71,14 @@ class UserLinksBlock extends BlockBase implements ContainerFactoryPluginInterfac
   public function build(): array {
     $account = $this->getRoutedUser();
     if (!$account) {
-      return [
-        '#markup' => $this->t('No user selected.'),
-      ];
+      return [];
     }
 
     $groups = $this->linkManager->getGroupedLinks($account, $this->currentUser);
+    if (empty($groups)) {
+      return [];
+    }
+
     return [
       '#theme' => 'makerspace_user_links_list',
       '#link_groups' => $groups,
