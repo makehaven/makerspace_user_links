@@ -16,6 +16,8 @@ use Drupal\user\UserInterface;
  *   The member being viewed.
  * @param \Drupal\Core\Session\AccountInterface $viewer
  *   The current user viewing the page.
+ * @param string $audience
+ *   The target audience for the links ('admin', 'facilitator', or 'member').
  *
  * @return array[]
  *   A list of link definitions. Each entry may contain:
@@ -28,6 +30,7 @@ use Drupal\user\UserInterface;
  *     helper text shown under the link.
  *   - category: (string|\Drupal\Core\StringTranslation\TranslatableMarkup)
  *     Optional category heading.
+ *   - audience: (string) Target audience ('admin' or 'member'). Defaults to 'admin'.
  *   - weight: (int) Sort weight within its category.
  *   - group_weight: (int) Sort weight for the category wrapper.
  *   - attributes: (array) HTML attributes added to the link (target, rel, etc).
@@ -35,17 +38,21 @@ use Drupal\user\UserInterface;
  *     link.
  *   - access: (bool) Explicit TRUE/FALSE flag to override default visibility.
  */
-function hook_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer): array {
+function hook_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer, string $audience): array {
   $links = [];
-  $links[] = [
-    'id' => 'example',
-    'title' => t('Example link'),
-    'url' => Url::fromRoute('entity.user.canonical', ['user' => $account->id()]),
-    'description' => t('Describe what this action does.'),
-    'category' => t('Demo tools'),
-    'weight' => -10,
-    'attributes' => ['target' => '_blank'],
-  ];
+
+  if ($audience === 'admin') {
+    $links[] = [
+      'id' => 'example',
+      'title' => t('Example Admin link'),
+      'url' => Url::fromRoute('entity.user.canonical', ['user' => $account->id()]),
+      'description' => t('Describe what this action does.'),
+      'category' => t('Demo tools'),
+      'weight' => -10,
+      'attributes' => ['target' => '_blank'],
+    ];
+  }
+
   return $links;
 }
 

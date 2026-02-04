@@ -33,17 +33,24 @@ class UserLinkManager {
 
   /**
    * Returns grouped links for the supplied account and viewer.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The user being viewed.
+   * @param \Drupal\Core\Session\AccountInterface $viewer
+   *   The person viewing the profile.
+   * @param string $audience
+   *   The target audience: 'admin', 'facilitator', or 'member'.
    */
-  public function getGroupedLinks(UserInterface $account, AccountInterface $viewer): array {
-    $links = $this->collectLinks($account, $viewer);
+  public function getGroupedLinks(UserInterface $account, AccountInterface $viewer, string $audience = 'admin'): array {
+    $links = $this->collectLinks($account, $viewer, $audience);
     return $this->groupLinks($links);
   }
 
   /**
    * Invokes hook implementations and normalizes definitions.
    */
-  protected function collectLinks(UserInterface $account, AccountInterface $viewer): array {
-    $link_sets = $this->moduleHandler->invokeAll('makerspace_user_links_links', [$account, $viewer]);
+  protected function collectLinks(UserInterface $account, AccountInterface $viewer, string $audience): array {
+    $link_sets = $this->moduleHandler->invokeAll('makerspace_user_links_links', [$account, $viewer, $audience]);
     $links = [];
     $seen = [];
 
@@ -51,6 +58,13 @@ class UserLinkManager {
       if (!is_array($definition)) {
         continue;
       }
+
+      // Filter by audience if specified in the definition.
+      $def_audience = $definition['audience'] ?? 'admin';
+      if ($def_audience !== $audience) {
+        continue;
+      }
+
       $normalized = $this->normalizeLinkDefinition($definition, $viewer);
       if (!$normalized) {
         continue;

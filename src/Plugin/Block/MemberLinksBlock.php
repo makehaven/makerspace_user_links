@@ -14,15 +14,15 @@ use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a block that lists makerspace admin/staff links.
+ * Provides a block that lists makerspace member-facing links.
  *
  * @Block(
- *   id = "makerspace_user_links_block",
- *   admin_label = @Translation("Admin User Links"),
+ *   id = "makerspace_member_links_block",
+ *   admin_label = @Translation("Member Actions"),
  *   category = @Translation("Makerspace")
  * )
  */
-class UserLinksBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class MemberLinksBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
 
@@ -42,7 +42,7 @@ class UserLinksBlock extends BlockBase implements ContainerFactoryPluginInterfac
   protected RouteMatchInterface $routeMatch;
 
   /**
-   * UserLinksBlock constructor.
+   * MemberLinksBlock constructor.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, UserLinkManager $link_manager, AccountInterface $current_user, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -74,7 +74,7 @@ class UserLinksBlock extends BlockBase implements ContainerFactoryPluginInterfac
       return [];
     }
 
-    $groups = $this->linkManager->getGroupedLinks($account, $this->currentUser, 'admin');
+    $groups = $this->linkManager->getGroupedLinks($account, $this->currentUser, 'member');
     if (empty($groups)) {
       return [];
     }
