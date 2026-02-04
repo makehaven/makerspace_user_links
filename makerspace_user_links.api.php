@@ -17,7 +17,7 @@ use Drupal\user\UserInterface;
  * @param \Drupal\Core\Session\AccountInterface $viewer
  *   The current user viewing the page.
  * @param string $audience
- *   The target audience for the links ('admin', 'facilitator', or 'member').
+ *   The target audience for the links ('admin', 'facilitator', or 'member'). Defaults to 'admin'.
  *
  * @return array[]
  *   A list of link definitions. Each entry may contain:
@@ -38,7 +38,7 @@ use Drupal\user\UserInterface;
  *     link.
  *   - access: (bool) Explicit TRUE/FALSE flag to override default visibility.
  */
-function hook_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer, string $audience): array {
+function hook_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer, string $audience = 'admin'): array {
   $links = [];
 
   if ($audience === 'admin') {

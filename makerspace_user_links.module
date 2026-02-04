@@ -27,7 +27,7 @@ function makerspace_user_links_theme(): array {
 /**
  * Implements hook_makerspace_user_links_links().
  */
-function makerspace_user_links_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer, string $audience): array {
+function makerspace_user_links_makerspace_user_links_links(UserInterface $account, AccountInterface $viewer, string $audience = 'admin'): array {
   $links = [];
   $route_parameters = ['user' => $account->id()];
 
