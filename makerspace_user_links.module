@@ -87,7 +87,7 @@ function makerspace_user_links_makerspace_user_links_links(UserInterface $accoun
   // 3. Admin Audience (Deep management).
   if ($audience === 'admin') {
     // Masquerade Link.
-    if ($viewer->hasPermission('masquerade as any user') && $account->id() != $viewer->id()) {
+    if (makerspace_user_links_can_masquerade($account, $viewer) && $account->id() != $viewer->id()) {
       if (\Drupal::moduleHandler()->moduleExists('masquerade')) {
         $links[] = [
           'id' => 'masquerade',
@@ -141,6 +141,23 @@ function makerspace_user_links_makerspace_user_links_links(UserInterface $accoun
   }
 
   return $links;
+}
+
+/**
+ * Determines whether a viewer can masquerade as the given account.
+ */
+function makerspace_user_links_can_masquerade(UserInterface $account, AccountInterface $viewer): bool {
+  if ($viewer->hasPermission('masquerade as any user')) {
+    return TRUE;
+  }
+
+  foreach ($account->getRoles() as $role) {
+    if ($viewer->hasPermission('masquerade as ' . $role)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
 
 /**
