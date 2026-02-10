@@ -147,17 +147,36 @@ function makerspace_user_links_makerspace_user_links_links(UserInterface $accoun
  * Determines whether a viewer can masquerade as the given account.
  */
 function makerspace_user_links_can_masquerade(UserInterface $account, AccountInterface $viewer): bool {
+  if (!\Drupal::moduleHandler()->moduleExists('masquerade')) {
+    return FALSE;
+  }
+
+  // Prefer native masquerade access logic when evaluating for the current user.
+  if (function_exists('masquerade_target_user_access') && (string) \Drupal::currentUser()->id() === (string) $viewer->id()) {
+    return masquerade_target_user_access($account);
+  }
+
+  // Fallback to mirrored core masquerade defaults when a non-current account
+  // is being evaluated.
+  if ($viewer->id() == 1) {
+    return TRUE;
+  }
+
+  if ($account->id() == 1) {
+    return $viewer->hasPermission('masquerade as super user');
+  }
+
   if ($viewer->hasPermission('masquerade as any user')) {
     return TRUE;
   }
 
   foreach ($account->getRoles() as $role) {
-    if ($viewer->hasPermission('masquerade as ' . $role)) {
-      return TRUE;
+    if (!$viewer->hasPermission('masquerade as ' . $role)) {
+      return FALSE;
     }
   }
 
-  return FALSE;
+  return TRUE;
 }
 
 /**
