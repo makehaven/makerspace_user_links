@@ -51,34 +51,53 @@ function makerspace_user_links_makerspace_member_attention(AccountInterface $acc
   if (\Drupal::moduleHandler()->moduleExists('makerspace_material_store')
     && \Drupal::hasService('makerspace_material_store.tab_limit')) {
     try {
-      $status = \Drupal::service('makerspace_material_store.tab_limit')->getStatus($account);
+      // Skip the eligibility gates (terms acceptance, Stripe account) so we get
+      // the member's REAL outstanding balance. Those gates are "you haven't
+      // opted into the tab yet" prompts that belong on the add-to-tab action
+      // (StoreController) — not a standing critical banner on /resources. We
+      // only nag members who actually have a materials-store tab: a real
+      // balance, or an explicit failed-payment/limit block.
+      $status = \Drupal::service('makerspace_material_store.tab_limit')->getStatus($account, 0.0, [
+        'skip_terms' => TRUE,
+        'skip_stripe' => TRUE,
+      ]);
       $total = (float) ($status['total'] ?? 0);
-      // A blocked tab (failed payment) early-returns from getStatus with
-      // total = 0, so check it first — that's the most urgent case.
-      if (!empty($status['blocked'])) {
+      $blocked = !empty($status['blocked']);
+
+      // Failed-payment block (field_store_tab_blocked) early-returns from
+      // getStatus with total = 0. Surface it even at $0 pending because the
+      // account has been explicitly flagged — that's the most urgent case.
+      if ($blocked && $total <= 0) {
         $reason = !empty($status['reason']) ? $status['reason'] : t('Your materials store tab is blocked due to a payment issue.');
         $items[] = [
           'id' => 'material_tab_blocked',
           'severity' => 'critical',
           'message' => $reason,
-          'action_label' => t('Resolve tab'),
+          'action_label' => t('Resolve store tab'),
           'action_url' => Url::fromRoute('makerspace_material_store.view_tab'),
           'icon' => 'exclamation-octagon',
           'weight' => 5,
           'cache_tags' => ['user:' . $account->id()],
         ];
       }
+      // Outstanding balance — a member who is in the program and owes money.
+      // Critical if it has hit a limit (blocked), otherwise a gentle reminder.
       elseif ($total > 0) {
         $items[] = [
-          'id' => 'material_tab',
-          'severity' => 'warning',
-          'message' => t('You have an unpaid materials tab of $@amount.', [
-            '@amount' => number_format($total, 2),
-          ]),
-          'action_label' => t('Pay tab'),
+          'id' => $blocked ? 'material_tab_blocked' : 'material_tab',
+          'severity' => $blocked ? 'critical' : 'warning',
+          'message' => $blocked
+            ? t('Your materials store tab of $@amount needs attention: @reason', [
+              '@amount' => number_format($total, 2),
+              '@reason' => $status['reason'],
+            ])
+            : t('You have an unpaid materials store tab of $@amount.', [
+              '@amount' => number_format($total, 2),
+            ]),
+          'action_label' => $blocked ? t('Resolve store tab') : t('Pay store tab'),
           'action_url' => Url::fromRoute('makerspace_material_store.view_tab'),
-          'icon' => 'basket',
-          'weight' => 10,
+          'icon' => $blocked ? 'exclamation-octagon' : 'basket',
+          'weight' => $blocked ? 5 : 10,
           'cache_tags' => ['user:' . $account->id()],
         ];
       }
