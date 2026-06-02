@@ -21,7 +21,126 @@ function makerspace_user_links_theme(): array {
       ],
       'template' => 'makerspace-user-links-list',
     ],
+    'makerspace_user_links_menu_cards' => [
+      'variables' => [
+        'title' => '',
+        'cards' => [],
+      ],
+      'template' => 'menu-cards',
+    ],
+    'makerspace_user_links_member_attention' => [
+      'variables' => [
+        'items' => [],
+      ],
+      'template' => 'member-attention',
+    ],
   ];
+}
+
+/**
+ * Implements hook_makerspace_member_attention().
+ *
+ * Starter implementation: surface an unpaid materials-store tab. Other signals
+ * (overdue lending, upcoming appointment, unsigned waiver) should be added by
+ * the modules that own that data — see makerspace_user_links.api.php.
+ */
+function makerspace_user_links_makerspace_member_attention(AccountInterface $account): array {
+  $items = [];
+
+  // Unpaid materials tab — only if the store module is installed.
+  if (\Drupal::moduleHandler()->moduleExists('makerspace_material_store')
+    && \Drupal::hasService('makerspace_material_store.tab_limit')) {
+    try {
+      $status = \Drupal::service('makerspace_material_store.tab_limit')->getStatus($account);
+      $total = (float) ($status['total'] ?? 0);
+      // A blocked tab (failed payment) early-returns from getStatus with
+      // total = 0, so check it first — that's the most urgent case.
+      if (!empty($status['blocked'])) {
+        $reason = !empty($status['reason']) ? $status['reason'] : t('Your materials store tab is blocked due to a payment issue.');
+        $items[] = [
+          'id' => 'material_tab_blocked',
+          'severity' => 'critical',
+          'message' => $reason,
+          'action_label' => t('Resolve tab'),
+          'action_url' => Url::fromRoute('makerspace_material_store.view_tab'),
+          'icon' => 'exclamation-octagon',
+          'weight' => 5,
+          'cache_tags' => ['user:' . $account->id()],
+        ];
+      }
+      elseif ($total > 0) {
+        $items[] = [
+          'id' => 'material_tab',
+          'severity' => 'warning',
+          'message' => t('You have an unpaid materials tab of $@amount.', [
+            '@amount' => number_format($total, 2),
+          ]),
+          'action_label' => t('Pay tab'),
+          'action_url' => Url::fromRoute('makerspace_material_store.view_tab'),
+          'icon' => 'basket',
+          'weight' => 10,
+          'cache_tags' => ['user:' . $account->id()],
+        ];
+      }
+    }
+    catch (\Throwable $e) {
+      \Drupal::logger('makerspace_user_links')->warning('Member attention (tab) failed: @m', ['@m' => $e->getMessage()]);
+    }
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_preprocess_menu().
+ *
+ * Makes "return to the page you were on" the default login behavior: for
+ * anonymous visitors, append the current page as a ?destination= to the Log in
+ * and Register menu links. login_destination has preserve_destination = TRUE,
+ * so this destination wins over the neutral /home fallback rule — the user
+ * lands back where they started instead of being redirected to a dashboard.
+ */
+function makerspace_user_links_preprocess_menu(array &$variables): void {
+  if (\Drupal::currentUser()->isAuthenticated()) {
+    return;
+  }
+  if (empty($variables['items'])) {
+    return;
+  }
+
+  $request = \Drupal::request();
+  $path_info = $request->getPathInfo();
+
+  // Don't bounce people back to an auth page — that would loop.
+  $auth_prefixes = ['/user/login', '/user/register', '/user/password', '/user/reset', '/user/logout'];
+  foreach ($auth_prefixes as $prefix) {
+    if (str_starts_with($path_info, $prefix)) {
+      return;
+    }
+  }
+
+  // Preserve the alias + query string the visitor currently sees.
+  $destination = $request->getRequestUri();
+
+  foreach ($variables['items'] as &$item) {
+    $url = $item['url'] ?? NULL;
+    if (!$url instanceof Url || !$url->isRouted()) {
+      continue;
+    }
+    if (!in_array($url->getRouteName(), ['user.login', 'user.register'], TRUE)) {
+      continue;
+    }
+    $options = $url->getOptions();
+    // Respect an explicit destination if one is already present.
+    if (!isset($options['query']['destination'])) {
+      $options['query']['destination'] = $destination;
+      $url->setOptions($options);
+    }
+  }
+
+  // The injected destination depends on the current path, so vary the cache.
+  $variables['#cache']['contexts'][] = 'url.path';
+  $variables['#cache']['contexts'][] = 'url.query_args';
 }
 
 /**
@@ -47,7 +166,7 @@ function makerspace_user_links_makerspace_user_links_links(UserInterface $accoun
         $links[] = [
           'id' => 'my_tab',
           'title' => t('My Tab'),
-          'route_name' => 'makerspace_material_store.tab',
+          'route_name' => 'makerspace_material_store.view_tab',
           'category' => t('Quick Links'),
           'weight' => -90,
           'description' => t('View your unpaid items.'),

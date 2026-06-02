@@ -1,0 +1,23 @@
+# Dashboard-first entries for the role menus. Defined in code (deployable)
+# rather than as content menu links, and surfaced as the first card by the
+# makerspace_role_menu_cards block. The instructor-tools menu already leads with
+# its Instructor Dashboard, so only facilitator and entrepreneur need one here.
+makerspace_user_links.facilitator_dashboard:
+  title: 'Facilitator Dashboard'
+  description: 'Your sessions, stats, and appointments.'
+  route_name: appointment_facilitator.dashboard
+  menu_name: facilitator-menu
+  weight: -100
+  options:
+    attributes:
+      data-icon: speedometer2
+
+makerspace_user_links.entrepreneur_dashboard:
+  title: 'Entrepreneur Dashboard'
+  description: 'Your business profile and ecosystem links.'
+  route_name: makerspace_entrepreneur_dashboard.member
+  menu_name: business-resources
+  weight: -100
+  options:
+    attributes:
+      data-icon: speedometer2

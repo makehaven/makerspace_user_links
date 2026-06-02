@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * "Needs your attention" strip for the current member.
+ *
+ * Available variables:
+ * - items: ranked list of { severity, message, action_label, action_url, icon }.
+ */
+#}
+<div class="mh-attention" role="region" aria-label="{{ 'Items that need your attention'|t }}">
+  {% for item in items %}
+    <div class="mh-attention__item mh-attention__item--{{ item.severity }}">
+      <span class="mh-attention__icon bi bi-{{ item.icon }}" aria-hidden="true"></span>
+      <span class="mh-attention__message">{{ item.message }}</span>
+      {% if item.action_url and item.action_label %}
+        <a href="{{ item.action_url }}" class="mh-attention__action">{{ item.action_label }}</a>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

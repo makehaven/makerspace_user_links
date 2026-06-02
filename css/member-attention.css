@@ -1,0 +1,84 @@
+/**
+ * "Needs your attention" strip (makerspace_member_attention block).
+ *
+ * One ranked strip of per-member action items. Colors use MakeHaven tokens
+ * (STYLE.md / tokens.css) with fallbacks; severity drives the accent.
+ */
+
+.mh-attention {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 0 1.5rem;
+}
+
+.mh-attention__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--mh-color-border, #e1e4e8);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: var(--mh-color-surface, #fff);
+}
+
+.mh-attention__item--critical {
+  border-left-color: var(--mh-color-danger, #b02a37);
+  background: var(--mh-color-danger-bg, #fbeaec);
+}
+
+.mh-attention__item--warning {
+  border-left-color: var(--mh-color-warning, #b8860b);
+  background: var(--mh-color-warning-bg, #fdf6e3);
+}
+
+.mh-attention__item--info {
+  border-left-color: var(--mh-color-brand-primary, #8b1919);
+}
+
+.mh-attention__icon {
+  flex: 0 0 auto;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.mh-attention__item--critical .mh-attention__icon {
+  color: var(--mh-color-danger, #b02a37);
+}
+
+.mh-attention__item--warning .mh-attention__icon {
+  color: var(--mh-color-warning, #b8860b);
+}
+
+.mh-attention__message {
+  flex: 1 1 auto;
+  font-size: 0.98rem;
+}
+
+.mh-attention__action {
+  flex: 0 0 auto;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  background: var(--mh-color-brand-primary, #8b1919);
+  color: #fff;
+}
+
+.mh-attention__action:hover,
+.mh-attention__action:focus {
+  filter: brightness(0.92);
+  color: #fff;
+  text-decoration: none;
+}
+
+@media (max-width: 575px) {
+  .mh-attention__item {
+    flex-wrap: wrap;
+  }
+  .mh-attention__action {
+    margin-left: 2.15rem;
+  }
+}

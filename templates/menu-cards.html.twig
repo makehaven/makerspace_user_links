@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Renders a menu's items as a row of icon cards.
+ *
+ * Available variables:
+ * - title: the block label (section heading).
+ * - cards: list of { title, url, description, icon } (icon = Bootstrap Icons name).
+ */
+#}
+<section class="mh-menu-cards">
+  {% if title %}
+    <h2 class="mh-menu-cards__title">{{ title }}</h2>
+  {% endif %}
+  <div class="mh-menu-cards__grid">
+    {% for card in cards %}
+      <a href="{{ card.url }}" class="mh-menu-cards__card">
+        <span class="mh-menu-cards__icon bi bi-{{ card.icon }}" aria-hidden="true"></span>
+        <span class="mh-menu-cards__label">{{ card.title }}</span>
+        {% if card.description %}
+          <span class="mh-menu-cards__desc">{{ card.description }}</span>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</section>

@@ -1,0 +1,10 @@
+block.settings.makerspace_role_menu_cards:
+  type: block_settings
+  label: 'Role menu (as cards) block'
+  mapping:
+    menu:
+      type: string
+      label: 'Menu machine name'
+    default_icon:
+      type: string
+      label: 'Default Bootstrap Icons name'
