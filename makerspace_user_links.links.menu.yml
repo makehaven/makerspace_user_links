@@ -1,23 +1,62 @@
-# Dashboard-first entries for the role menus. Defined in code (deployable)
-# rather than as content menu links, and surfaced as the first card by the
-# makerspace_role_menu_cards block. The instructor-tools menu already leads with
-# its Instructor Dashboard, so only facilitator and entrepreneur need one here.
-makerspace_user_links.facilitator_dashboard:
-  title: 'Facilitator Dashboard'
-  description: 'Your sessions, stats, and appointments.'
-  route_name: appointment_facilitator.dashboard
-  menu_name: facilitator-menu
-  weight: -100
+# "Your Dashboards" launcher row (menu: your-dashboards) — one card per role
+# hub, rendered by the makerspace_role_menu_cards block on /resources. The
+# block access-filters the tree, so each member sees only the hubs they can
+# reach. Keep to genuine role/permission-gated dashboards. CiviCRM's route is
+# `_access: TRUE` (it gates internally), so its card carries an explicit
+# mh_access_permission for the block to honor.
+#
+# The per-role quick-link menus (facilitator-menu, business-resources) now
+# render on their own dashboard pages rather than on /resources, so their old
+# code-defined "lead dashboard" links were removed from here (they would have
+# been self-links on those pages); the launcher row below is the single entry
+# point to each dashboard.
+makerspace_user_links.dash.staff_tools:
+  title: 'Staff Tools Dashboard'
+  description: 'All staff reports, queues, and operational tools in one organized place.'
+  route_name: makerspace_staff_tools.dashboard
+  menu_name: your-dashboards
+  weight: 0
   options:
     attributes:
-      data-icon: speedometer2
+      data-icon: tools
 
-makerspace_user_links.entrepreneur_dashboard:
-  title: 'Entrepreneur Dashboard'
-  description: 'Your business profile and ecosystem links.'
-  route_name: makerspace_entrepreneur_dashboard.member
-  menu_name: business-resources
-  weight: -100
+makerspace_user_links.dash.instructor:
+  title: 'Instructor Dashboard'
+  description: 'Your classes, attendance, and post-event tasks.'
+  route_name: instructor_companion.dashboard
+  menu_name: your-dashboards
+  weight: 10
   options:
     attributes:
-      data-icon: speedometer2
+      data-icon: mortarboard
+
+makerspace_user_links.dash.facilitator:
+  title: 'Facilitator Dashboard'
+  description: 'Your appointments, availability, and facilitation stats.'
+  route_name: appointment_facilitator.dashboard
+  menu_name: your-dashboards
+  weight: 20
+  options:
+    attributes:
+      data-icon: calendar-check
+
+makerspace_user_links.dash.entrepreneur:
+  title: 'Entrepreneur Dashboard'
+  description: 'Your business profile, products, and ecosystem links.'
+  route_name: makerspace_entrepreneur_dashboard.member
+  menu_name: your-dashboards
+  weight: 25
+  options:
+    attributes:
+      data-icon: briefcase
+
+makerspace_user_links.dash.civicrm:
+  title: 'CiviCRM'
+  description: 'Contacts, contributions, events, and mailings.'
+  url: 'internal:/civicrm'
+  menu_name: your-dashboards
+  weight: 30
+  options:
+    mh_access_permission: 'access CiviCRM'
+    attributes:
+      data-icon: people

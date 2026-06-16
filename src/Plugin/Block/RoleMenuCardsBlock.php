@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -38,11 +39,17 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
   protected MenuLinkTreeInterface $menuTree;
 
   /**
+   * The current user.
+   */
+  protected AccountInterface $currentUser;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuLinkTreeInterface $menu_tree) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuLinkTreeInterface $menu_tree, AccountInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->menuTree = $menu_tree;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -53,7 +60,8 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('menu.link_tree')
+      $container->get('menu.link_tree'),
+      $container->get('current_user')
     );
   }
 
@@ -118,8 +126,19 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
         continue;
       }
       $link = $element->link;
-      $url = $link->getUrlObject();
       $options = $link->getOptions();
+
+      // Some destinations gate access internally rather than at the Drupal
+      // route level (e.g. CiviCRM's /civicrm is `_access: TRUE` and enforces
+      // its own permissions), so the menu access-filter above cannot hide
+      // them. A link may declare `options.mh_access_permission` to require a
+      // Drupal permission before its card renders.
+      $required_permission = $options['mh_access_permission'] ?? NULL;
+      if ($required_permission && !$this->currentUser->hasPermission($required_permission)) {
+        continue;
+      }
+
+      $url = $link->getUrlObject();
       $icon = $options['attributes']['data-icon'] ?? $this->configuration['default_icon'];
 
       $cards[] = [
