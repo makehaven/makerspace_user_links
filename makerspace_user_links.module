@@ -333,3 +333,40 @@ function makerspace_user_links_route_user(RouteMatchInterface $route_match): ?Us
   }
   return NULL;
 }
+
+/**
+ * Implements hook_webform_submission_presave().
+ *
+ * Staff often report a problem while masquerading as the member who hit it,
+ * because that is the only way to see the page as they see it. The website
+ * feedback form fills reported_by_* from [current-user:*], so those reports
+ * were attributed to the member: the "we got your report" email and every
+ * later status email from the feedback board went to the member, and the
+ * staffer who filed it never heard back (2026-09-28: three of the last ten
+ * staff reports).
+ *
+ * Record the real person as the reporter and keep the viewed-as member in
+ * masquerading_as_* so the context is not lost.
+ */
+function makerspace_user_links_webform_submission_presave($webform_submission): void {
+  if ($webform_submission->getWebform()->id() !== 'website_feedback' || !$webform_submission->isNew()) {
+    return;
+  }
+  if (!\Drupal::moduleHandler()->moduleExists('masquerade') || !\Drupal::service('masquerade')->isMasquerading()) {
+    return;
+  }
+
+  $original_uid = (int) \Drupal::service('session')->getMetadataBag()->getMasquerade();
+  $original = $original_uid ? \Drupal::entityTypeManager()->getStorage('user')->load($original_uid) : NULL;
+  if (!$original instanceof UserInterface) {
+    return;
+  }
+
+  $data = $webform_submission->getData();
+  $data['masquerading_as_uid'] = $data['reported_by_uid'] ?? (string) \Drupal::currentUser()->id();
+  $data['masquerading_as_name'] = $data['reported_by_name'] ?? \Drupal::currentUser()->getDisplayName();
+  $data['reported_by_uid'] = (string) $original->id();
+  $data['reported_by_name'] = $original->getDisplayName();
+  $data['reported_by_mail'] = (string) $original->getEmail();
+  $webform_submission->setData($data);
+}
