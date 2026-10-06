@@ -1,0 +1,240 @@
+/**
+ * @file
+ * The logged-in member bar. Renders in both the Gin member theme and the d11
+ * public theme, so every colour carries a fallback: Gin does not load the d11
+ * token file.
+ */
+
+.mh-member-bar {
+  --mhb-bg: var(--mh-color-brand-primary-strong, #710a0a);
+  --mhb-fg: #fff;
+  --mhb-hover: rgba(255, 255, 255, 0.14);
+  --mhb-panel-bg: var(--mh-color-surface, #fff);
+  --mhb-panel-fg: var(--mh-color-neutral-900, #1e1f24);
+  --mhb-panel-hover: var(--mh-color-neutral-100, #f2f2f2);
+  --mhb-border: var(--mh-color-border, #d9d9d9);
+  position: relative;
+  z-index: 600;
+  background: var(--mhb-bg);
+  color: var(--mhb-fg);
+  font-family: var(--mh-font-sans, "Montserrat", "Roboto", "Helvetica Neue", Arial, sans-serif);
+  font-weight: 500;
+  /* px, not rem: Gin and d11 set different root sizes, and the bar must
+     measure the same in both. */
+  font-size: 15px;
+  line-height: 1.2;
+  container: mhbar / inline-size;
+}
+
+.mh-member-bar *,
+.mh-member-bar *::before,
+.mh-member-bar *::after {
+  box-sizing: border-box;
+}
+
+.mh-member-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+}
+
+.mh-member-bar a,
+.mh-member-bar summary {
+  /* Both themes style links; the bar keeps its own type. */
+  font: inherit;
+  letter-spacing: normal;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.375rem;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mh-member-bar a:hover,
+.mh-member-bar a:focus-visible,
+.mh-member-bar summary:hover,
+.mh-member-bar summary:focus-visible,
+.mh-member-bar details[open] > summary {
+  background: var(--mhb-hover);
+  color: inherit;
+  text-decoration: none;
+}
+
+.mh-member-bar a:focus-visible,
+.mh-member-bar summary:focus-visible {
+  outline: 2px solid var(--mh-color-accent-gold, #ffc658);
+  outline-offset: 1px;
+}
+
+.mh-member-bar summary {
+  list-style: none;
+}
+
+.mh-member-bar summary::-webkit-details-marker {
+  display: none;
+}
+
+.mh-member-bar ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Brand: the "you are inside" signature. */
+.mh-member-bar__brand {
+  margin-right: 0.5rem;
+  font-weight: 700;
+}
+
+.mh-member-bar__brand-tag {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--mh-color-accent-gold, #ffc658);
+  color: var(--mh-color-neutral-900, #1e1f24);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mh-member-bar__primary {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 0;
+  /* Last resort: clip rather than run under the end group. member-bar.js
+     switches to icons before this is ever visible. */
+  overflow: hidden;
+}
+
+.mh-member-bar__primary a[aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
+  border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.mh-member-bar__end {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  margin-left: auto;
+}
+
+.mh-member-bar__name {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dropdowns. */
+.mh-member-bar__drop {
+  position: relative;
+}
+
+.mh-member-bar__panel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  min-width: 14rem;
+  padding: 0.35rem;
+  border: 1px solid var(--mhb-border);
+  border-radius: 0.5rem;
+  background: var(--mhb-panel-bg);
+  color: var(--mhb-panel-fg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.mh-member-bar__panel a {
+  display: flex;
+  width: 100%;
+  color: var(--mhb-panel-fg);
+}
+
+.mh-member-bar__panel a:hover,
+.mh-member-bar__panel a:focus-visible,
+.mh-member-bar__panel a[aria-current="page"] {
+  background: var(--mhb-panel-hover);
+  color: var(--mhb-panel-fg);
+}
+
+.mh-member-bar__panel .bi {
+  width: 1.1rem;
+  color: var(--mh-color-brand-primary, #8b1919);
+}
+
+.mh-member-bar__group {
+  margin: 0.5rem 0.65rem 0.25rem;
+  color: var(--mh-color-neutral-600, #616161);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* The mobile menu button is hidden until the primary links stop fitting. */
+.mh-member-bar__menu-toggle {
+  display: none;
+}
+
+/* When the labels do not fit (member-bar.js measures), links shrink to
+   icons in two steps; the labels stay for screen readers, and the title
+   attribute shows them on hover. */
+.mh-member-bar.is-tight .mh-member-bar__end .mh-member-bar__label,
+.mh-member-bar.is-compact .mh-member-bar__primary .mh-member-bar__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@container mhbar (max-width: 760px) {
+  .mh-member-bar__primary,
+  .mh-member-bar__dashboards,
+  .mh-member-bar__name,
+  .mh-member-bar__site .mh-member-bar__label {
+    display: none;
+  }
+
+  .mh-member-bar__menu-toggle {
+    display: block;
+  }
+
+  /* The phone menu spans the bar instead of hanging off its button. */
+  .mh-member-bar__inner,
+  .mh-member-bar__menu-toggle {
+    position: static;
+  }
+
+  .mh-member-bar__panel--wide {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: calc(100% + 0.25rem);
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+}
+
+@container mhbar (max-width: 380px) {
+  .mh-member-bar__brand-name {
+    display: none;
+  }
+}
+
+/* d11 shows status messages as toasts pinned to the top-right corner
+   (Bootstrap's `top-0` is !important); keep them clear of the account menu. */
+body:has(.mh-member-bar) .toast-container.position-fixed.top-0 {
+  top: 3.25rem !important;
+}
+
+@media print {
+  .mh-member-bar {
+    display: none;
+  }
+}

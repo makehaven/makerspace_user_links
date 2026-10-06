@@ -27,3 +27,15 @@ bootstrap_icons:
   css:
     theme:
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css': { type: external, minified: true }
+
+member_bar:
+  version: '1.4'
+  css:
+    theme:
+      css/member-bar.css: {}
+  js:
+    js/member-bar.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - makerspace_user_links/bootstrap_icons

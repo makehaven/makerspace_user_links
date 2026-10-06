@@ -4,3 +4,10 @@ services:
     arguments:
       - '@module_handler'
       - '@string_translation'
+
+  makerspace_user_links.member_bar:
+    class: Drupal\makerspace_user_links\MemberBar
+    arguments:
+      - '@menu.link_tree'
+      - '@current_user'
+      - '@path.current'

@@ -28,6 +28,32 @@ This is a custom Drupal module designed to collect, group, and display administr
   - CSS: `css/user-links.css`.
   - Library: `makerspace_user_links/user_links`.
 
+## Member bar
+
+Every logged-in page in the member (`makerspace_gin`) and public (d11) themes
+starts with the member bar (`MemberBar`, injected by `hook_page_top`). It is
+the navigation for everyone without `access navigation`; since 2026-10 only
+staff roles (administrator, manager, special, librarian, event_management,
+data) keep core's Navigation sidebar. Members, borrowers, facilitators,
+instructors and content editors rely on the bar.
+
+- Links come from three menus, all access-filtered: `member-nav` (primary),
+  `your-dashboards` (the "Dashboards" dropdown; also the hub's role cards) and
+  `member-account` (profile, billing, log out). They are code-defined in
+  `makerspace_user_links.links.menu.yml`; staff can reorder or disable them in
+  the menu UI. Give every link a `data-icon` (Bootstrap Icons name): on narrow
+  screens the primary links show icons only.
+- `options.mh_access_permission` hides a link from anyone without that
+  permission, for destinations whose route does not gate access (CiviCRM) or
+  is too broad (members hold `access administration pages`).
+- `js/member-bar.js` measures the bar and sheds labels in two steps
+  (`is-tight`, then `is-compact`) instead of fixed breakpoints, because Gin and
+  d11 render the bar in different fonts.
+- When adding a link to a sidebar menu, or removing one from these menus, run
+  `lando drush php:script scripts/audit/member-bar-reachability.php` from the
+  site repo: it fails if a non-staff test user can reach a link only through
+  the sidebar.
+
 ## Building and Running
 
 As a Drupal module, this project runs within a Drupal environment (typically via Lando).

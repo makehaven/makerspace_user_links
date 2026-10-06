@@ -60,3 +60,210 @@ makerspace_user_links.dash.civicrm:
     mh_access_permission: 'access CiviCRM'
     attributes:
       data-icon: people
+
+makerspace_user_links.dash.facilitator_utilities:
+  title: 'Facilitator utilities'
+  description: 'Badge approvals, member search, nametags and guides.'
+  route_name: entity.node.canonical
+  route_parameters:
+    node: '34702'
+  menu_name: your-dashboards
+  weight: 21
+  options:
+    mh_access_permission: 'view own facilitator stats'
+    attributes:
+      data-icon: wrench-adjustable
+
+makerspace_user_links.dash.equipment_status:
+  title: 'Equipment status'
+  description: 'What is up, down or waiting on repair.'
+  route_name: asset_status.tool_status_board
+  menu_name: your-dashboards
+  weight: 22
+  options:
+    mh_access_permission: 'view own facilitator stats'
+    attributes:
+      data-icon: activity
+
+makerspace_user_links.dash.content:
+  title: 'Site content'
+  description: 'Pages, blog posts and other site content.'
+  route_name: system.admin_content
+  menu_name: your-dashboards
+  weight: 35
+  options:
+    attributes:
+      data-icon: file-earmark-text
+
+makerspace_user_links.dash.newsletter:
+  title: 'Newsletter console'
+  description: 'Weekly digest and monthly newsletter.'
+  route_name: makerspace_digest_scheduler.console
+  menu_name: your-dashboards
+  weight: 36
+  options:
+    attributes:
+      data-icon: envelope-paper
+
+# Members hold 'access administration pages' too, so the site-admin overview
+# is gated on a permission only editors and staff carry.
+makerspace_user_links.dash.site_admin:
+  title: 'Site admin'
+  description: 'Structure, media, configuration and help.'
+  route_name: system.admin
+  menu_name: your-dashboards
+  weight: 37
+  options:
+    mh_access_permission: 'administer media'
+    attributes:
+      data-icon: sliders
+
+# Member bar (MemberBar): the navigation every logged-in person gets in place
+# of core's Navigation sidebar, which only staff roles keep. Icons matter: on
+# narrower screens the primary links shrink to icons alone.
+makerspace_user_links.bar.home:
+  title: 'Home'
+  description: 'Your member hub.'
+  route_name: entity.node.canonical
+  route_parameters:
+    node: '619'
+  menu_name: member-nav
+  weight: 0
+  options:
+    attributes:
+      data-icon: house-door
+
+makerspace_user_links.bar.membership:
+  title: 'My Membership'
+  route_name: entity.node.canonical
+  route_parameters:
+    node: '5737'
+  menu_name: member-nav
+  weight: 10
+  options:
+    attributes:
+      data-icon: person-badge
+
+makerspace_user_links.bar.badges:
+  title: 'Badges'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: badges
+  menu_name: member-nav
+  weight: 20
+  options:
+    attributes:
+      data-icon: award
+
+makerspace_user_links.bar.appointments:
+  title: 'Appointments'
+  route_name: appointment_facilitator.appointments_dashboard
+  menu_name: member-nav
+  weight: 30
+  options:
+    attributes:
+      data-icon: calendar-check
+
+makerspace_user_links.bar.events:
+  title: 'Events'
+  route_name: view.event_set.all_upcoming
+  menu_name: member-nav
+  weight: 40
+  options:
+    attributes:
+      data-icon: calendar-event
+
+makerspace_user_links.bar.equipment:
+  title: 'Equipment'
+  route_name: view.equipment.page_1
+  menu_name: member-nav
+  weight: 50
+  options:
+    attributes:
+      data-icon: tools
+
+makerspace_user_links.bar.help:
+  title: 'Help'
+  url: 'internal:/member-faq'
+  menu_name: member-nav
+  weight: 60
+  options:
+    attributes:
+      data-icon: question-circle
+
+makerspace_user_links.account.profile:
+  title: 'My profile'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: main
+  menu_name: member-account
+  weight: 0
+  options:
+    attributes:
+      data-icon: person
+
+makerspace_user_links.account.settings:
+  title: 'Account settings'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: edit
+  menu_name: member-account
+  weight: 10
+  options:
+    attributes:
+      data-icon: gear
+
+makerspace_user_links.account.billing:
+  title: 'Billing'
+  route_name: chargebee_portal.payment_portal
+  menu_name: member-account
+  weight: 20
+  options:
+    attributes:
+      data-icon: credit-card
+
+makerspace_user_links.account.purchases:
+  title: 'My purchases'
+  route_name: mh_stripe.my_purchases
+  menu_name: member-account
+  weight: 30
+  options:
+    attributes:
+      data-icon: receipt
+
+makerspace_user_links.account.storage:
+  title: 'My storage'
+  route_name: storage_manager.member_dashboard
+  menu_name: member-account
+  weight: 40
+  options:
+    attributes:
+      data-icon: box-seam
+
+makerspace_user_links.account.create:
+  title: 'Create a post'
+  description: 'Projects, wishes, resources and your business profile.'
+  route_name: node.add_page
+  menu_name: member-account
+  weight: 50
+  options:
+    attributes:
+      data-icon: plus-circle
+
+makerspace_user_links.account.unmasquerade:
+  title: 'Switch back'
+  route_name: masquerade.unmasquerade
+  menu_name: member-account
+  weight: 90
+  options:
+    attributes:
+      data-icon: arrow-counterclockwise
+
+makerspace_user_links.account.logout:
+  title: 'Log out'
+  route_name: user.logout
+  menu_name: member-account
+  weight: 100
+  options:
+    attributes:
+      data-icon: box-arrow-right

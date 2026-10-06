@@ -9,6 +9,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\makerspace_user_links\MemberBar;
 
 /**
  * Implements hook_theme().
@@ -34,7 +35,36 @@ function makerspace_user_links_theme(): array {
       ],
       'template' => 'member-attention',
     ],
+    'makerspace_user_links_member_bar' => [
+      'variables' => [
+        'home_url' => '',
+        'site_url' => '',
+        'primary' => [],
+        'dashboards' => [],
+        'account' => [],
+        'display_name' => '',
+      ],
+      'template' => 'member-bar',
+    ],
   ];
+}
+
+/**
+ * Implements hook_page_top().
+ *
+ * Puts the member bar above every page a logged-in person sees in the member
+ * (Gin) and public (d11) themes. It is the navigation that replaces core's
+ * sidebar for everyone except staff roles; see MemberBar.
+ */
+function makerspace_user_links_page_top(array &$page_top): void {
+  if (\Drupal::currentUser()->isAnonymous()) {
+    return;
+  }
+  $theme = \Drupal::theme()->getActiveTheme()->getName();
+  if (!in_array($theme, MemberBar::THEMES, TRUE)) {
+    return;
+  }
+  $page_top['makerspace_member_bar'] = \Drupal::service('makerspace_user_links.member_bar')->placeholder();
 }
 
 /**

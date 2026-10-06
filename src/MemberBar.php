@@ -1,0 +1,139 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\makerspace_user_links;
+
+use Drupal\Core\Menu\MenuLinkTreeInterface;
+use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+
+/**
+ * Builds the logged-in member bar shown at the top of every member page.
+ *
+ * The bar replaces core's Navigation sidebar for members, facilitators,
+ * instructors, borrowers and content editors (only staff roles keep
+ * `access navigation`). Everything in it comes from three menus so staff can
+ * reorder or disable links without code:
+ *
+ * - member-nav: the primary destinations.
+ * - your-dashboards: one entry per role hub, shown as a "Dashboards" menu.
+ * - member-account: profile, billing, log out.
+ *
+ * Every tree is access-filtered, so a link the viewer cannot reach never
+ * renders. Links may also declare `options.mh_access_permission` for
+ * destinations that gate access internally (CiviCRM).
+ */
+class MemberBar implements TrustedCallbackInterface {
+
+  use StringTranslationTrait;
+
+  /**
+   * Themes the bar renders in. The kiosk theme and Claro are excluded.
+   */
+  public const THEMES = ['makerspace_gin', 'barrio_boostrap_5_makehaven_d11'];
+
+  public function __construct(
+    protected MenuLinkTreeInterface $menuTree,
+    protected AccountInterface $currentUser,
+    protected CurrentPathStack $currentPath,
+  ) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks(): array {
+    return ['build'];
+  }
+
+  /**
+   * Returns a placeholder for the bar; the bar varies per user and page.
+   */
+  public function placeholder(): array {
+    return [
+      '#lazy_builder' => ['makerspace_user_links.member_bar:build', []],
+      '#create_placeholder' => TRUE,
+    ];
+  }
+
+  /**
+   * Lazy builder: renders the bar for the current user.
+   */
+  public function build(): array {
+    $cache = [
+      'contexts' => ['user', 'url.path'],
+      'tags' => [
+        'config:system.menu.member-nav',
+        'config:system.menu.member-account',
+        'config:system.menu.your-dashboards',
+      ],
+    ];
+    if ($this->currentUser->isAnonymous()) {
+      return ['#cache' => $cache];
+    }
+
+    $current = $this->currentPath->getPath();
+
+    return [
+      '#theme' => 'makerspace_user_links_member_bar',
+      '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => 619])->toString(),
+      '#site_url' => Url::fromRoute('<front>')->toString(),
+      '#primary' => $this->links('member-nav', $current),
+      '#dashboards' => $this->links('your-dashboards', $current),
+      '#account' => $this->links('member-account', $current),
+      '#display_name' => $this->currentUser->getDisplayName(),
+      '#attached' => ['library' => ['makerspace_user_links/member_bar']],
+      '#cache' => $cache,
+    ];
+  }
+
+  /**
+   * Returns a menu's top-level links that the current user can reach.
+   *
+   * @return array
+   *   A list of links, each keyed title, url, icon and active.
+   */
+  public function links(string $menu_name, string $current_path = ''): array {
+    $parameters = (new MenuTreeParameters())->setMaxDepth(1)->onlyEnabledLinks();
+    $tree = $this->menuTree->load($menu_name, $parameters);
+    $tree = $this->menuTree->transform($tree, [
+      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+    ]);
+
+    $links = [];
+    foreach ($tree as $element) {
+      if (!$element->access || !$element->access->isAllowed()) {
+        continue;
+      }
+      $link = $element->link;
+      $options = $link->getOptions();
+      $permission = $options['mh_access_permission'] ?? NULL;
+      if ($permission && !$this->currentUser->hasPermission($permission)) {
+        continue;
+      }
+      $url = $link->getUrlObject();
+      try {
+        $href = $url->toString();
+        $internal = $url->isRouted() ? '/' . $url->getInternalPath() : '';
+      }
+      catch (\Exception) {
+        // A link whose providing module is off; skip it rather than break
+        // every page.
+        continue;
+      }
+      $links[] = [
+        'title' => (string) $link->getTitle(),
+        'url' => $href,
+        'icon' => preg_replace('/[^a-z0-9-]/', '', (string) ($options['attributes']['data-icon'] ?? '')),
+        'active' => $internal !== '' && $internal === $current_path,
+      ];
+    }
+    return $links;
+  }
+
+}

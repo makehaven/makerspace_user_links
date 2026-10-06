@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - makerspace_user_links
+id: member-account
+label: 'Member account'
+description: 'Account menu in the logged-in member bar.'
+locked: true

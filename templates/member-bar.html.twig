@@ -1,0 +1,82 @@
+{#
+/**
+ * @file
+ * The logged-in member bar (see MemberBar).
+ *
+ * Available variables:
+ * - home_url: the member hub.
+ * - site_url: the public front page.
+ * - primary, dashboards, account: lists of { title, url, icon, active }.
+ * - display_name: the viewer's name, labels the account menu.
+ */
+#}
+<nav class="mh-member-bar" aria-label="{{ 'Member'|t }}">
+  <div class="mh-member-bar__inner">
+    <a class="mh-member-bar__brand" href="{{ home_url }}">
+      <span class="mh-member-bar__brand-name">MakeHaven</span>
+      <span class="mh-member-bar__brand-tag">{{ 'Members'|t }}</span>
+    </a>
+
+    <details class="mh-member-bar__menu-toggle mh-member-bar__drop">
+      <summary aria-label="{{ 'Menu'|t }}">
+        <span class="bi bi-list" aria-hidden="true"></span>
+        <span class="mh-member-bar__toggle-label">{{ 'Menu'|t }}</span>
+      </summary>
+      <div class="mh-member-bar__panel mh-member-bar__panel--wide">
+        <ul class="mh-member-bar__list">
+          {% for link in primary %}
+            <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
+              {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
+          {% endfor %}
+        </ul>
+        {% if dashboards %}
+          <p class="mh-member-bar__group">{{ 'Dashboards'|t }}</p>
+          <ul class="mh-member-bar__list">
+            {% for link in dashboards %}
+              <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
+                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </details>
+
+    <ul class="mh-member-bar__primary">
+      {% for link in primary %}
+        <li><a href="{{ link.url }}" title="{{ link.title }}"{{ link.active ? ' aria-current="page"' }}>
+          {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__label">{{ link.title }}</span></a></li>
+      {% endfor %}
+    </ul>
+
+    <div class="mh-member-bar__end">
+      {% if dashboards %}
+        <details class="mh-member-bar__drop mh-member-bar__dashboards">
+          <summary title="{{ 'Dashboards'|t }}"><span class="bi bi-speedometer2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Dashboards'|t }}</span></summary>
+          <ul class="mh-member-bar__panel mh-member-bar__list">
+            {% for link in dashboards %}
+              <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
+                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </details>
+      {% endif %}
+
+      <a class="mh-member-bar__site" href="{{ site_url }}" title="{{ 'Public website'|t }}">
+        <span class="bi bi-globe2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Website'|t }}</span>
+      </a>
+
+      <details class="mh-member-bar__drop mh-member-bar__account">
+        <summary>
+          <span class="bi bi-person-circle" aria-hidden="true"></span>
+          <span class="mh-member-bar__name">{{ display_name }}</span>
+        </summary>
+        <ul class="mh-member-bar__panel mh-member-bar__list">
+          {% for link in account %}
+            <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
+              {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+    </div>
+  </div>
+</nav>
