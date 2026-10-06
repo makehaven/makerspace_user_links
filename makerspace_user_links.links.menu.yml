@@ -122,7 +122,8 @@ makerspace_user_links.dash.site_admin:
 # of core's Navigation sidebar, which only staff roles keep. Icons matter: on
 # narrower screens the primary links shrink to icons alone.
 makerspace_user_links.bar.home:
-  title: 'Home'
+  # Not "Home": on the public site that reads as the public homepage.
+  title: 'Member Resources'
   description: 'Your member hub.'
   route_name: entity.node.canonical
   route_parameters:
