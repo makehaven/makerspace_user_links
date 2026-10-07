@@ -120,6 +120,45 @@
   padding-right: 0.5rem;
 }
 
+/* Dropdowns that open from the primary row (Facilitators). The primary row
+   clips overflow, so these panels open in the bar's coordinates instead. */
+.mh-member-bar__primary {
+  overflow: visible;
+}
+
+.mh-member-bar__panel--start {
+  left: 0;
+  right: auto;
+  min-width: 17rem;
+}
+
+.mh-member-bar__caret {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.mh-member-bar__item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  white-space: normal;
+}
+
+.mh-member-bar__item-text small {
+  color: var(--mh-color-neutral-600, #616161);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.mh-member-bar__primary summary[data-active] {
+  box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
+  border-radius: 0.375rem 0.375rem 0 0;
+}
+
+.mh-member-bar__list-group > .mh-member-bar__list {
+  padding-left: 0.5rem;
+}
+
 .mh-member-bar__primary a[aria-current="page"] {
   box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
   border-radius: 0.375rem 0.375rem 0 0;

@@ -97,19 +97,30 @@ class MemberBar implements TrustedCallbackInterface {
   }
 
   /**
-   * Returns a menu's top-level links that the current user can reach.
+   * Returns a menu's links that the current user can reach, two levels deep.
+   *
+   * A top-level link with children renders as a dropdown in the bar (for
+   * example Facilitators: Who's On, My appointments). A parent that points
+   * nowhere (`<nolink>`) and has no reachable children is dropped.
    *
    * @return array
-   *   A list of links, each keyed title, description, url, icon and active.
+   *   A list of links, each keyed title, description, url (empty for
+   *   <nolink>), icon, active and children (the same shape, one level).
    */
   public function links(string $menu_name, string $current_path = ''): array {
-    $parameters = (new MenuTreeParameters())->setMaxDepth(1)->onlyEnabledLinks();
+    $parameters = (new MenuTreeParameters())->setMaxDepth(2)->onlyEnabledLinks();
     $tree = $this->menuTree->load($menu_name, $parameters);
     $tree = $this->menuTree->transform($tree, [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ]);
+    return $this->buildLinks($tree, $current_path, TRUE);
+  }
 
+  /**
+   * Turns an access-checked menu tree into template variables.
+   */
+  protected function buildLinks(array $tree, string $current_path, bool $recurse): array {
     $links = [];
     foreach ($tree as $element) {
       if (!$element->access || !$element->access->isAllowed()) {
@@ -122,21 +133,31 @@ class MemberBar implements TrustedCallbackInterface {
         continue;
       }
       $url = $link->getUrlObject();
+      $nolink = $url->isRouted() && $url->getRouteName() === '<nolink>';
       try {
-        $href = $url->toString();
-        $internal = $url->isRouted() ? '/' . $url->getInternalPath() : '';
+        $href = $nolink ? '' : $url->toString();
+        $internal = (!$nolink && $url->isRouted()) ? '/' . $url->getInternalPath() : '';
       }
       catch (\Exception) {
         // A link whose providing module is off; skip it rather than break
         // every page.
         continue;
       }
+      $children = ($recurse && $element->subtree) ? $this->buildLinks($element->subtree, $current_path, FALSE) : [];
+      if ($nolink && !$children) {
+        continue;
+      }
+      $active = $internal !== '' && $internal === $current_path;
+      foreach ($children as $child) {
+        $active = $active || $child['active'];
+      }
       $links[] = [
         'title' => (string) $link->getTitle(),
         'description' => (string) $link->getDescription(),
         'url' => $href,
         'icon' => preg_replace('/[^a-z0-9-]/', '', (string) ($options['attributes']['data-icon'] ?? '')),
-        'active' => $internal !== '' && $internal === $current_path,
+        'active' => $active,
+        'children' => $children,
       ];
     }
     return $links;

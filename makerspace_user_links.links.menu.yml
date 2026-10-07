@@ -118,84 +118,79 @@ makerspace_user_links.dash.site_admin:
     attributes:
       data-icon: sliders
 
-# Member bar (MemberBar): the navigation every logged-in person gets in place
-# of core's Navigation sidebar, which only staff roles keep. Icons matter: on
-# narrower screens the primary links shrink to icons alone.
-makerspace_user_links.bar.home:
-  # Not "Home": on the public site that reads as the public homepage.
-  title: 'Member Resources'
-  description: 'Your member hub.'
-  route_name: entity.node.canonical
-  route_parameters:
-    node: '619'
+# Member bar (MemberBar): the navigation every logged-in person without
+# core's Navigation sidebar gets. Shaped by staff (2026-10-06): members start
+# from TOOLS and find badges through a tool (the /badges list hides which tool
+# a badge is for); appointments are with facilitators, so they live under
+# Facilitators with the schedule; events are public, so they stay on the
+# public site. A link with children renders as a dropdown. Give every link a
+# data-icon: on narrow screens the primary links show icons only.
+makerspace_user_links.bar.tools:
+  title: 'Tools'
+  description: 'Every tool and area, with the badge each one needs.'
+  route_name: view.equipment.page_1
   menu_name: member-nav
   weight: 0
   options:
     attributes:
-      data-icon: house-door
+      data-icon: tools
 
-makerspace_user_links.bar.membership:
-  title: 'My Membership'
-  route_name: entity.node.canonical
-  route_parameters:
-    node: '5737'
+makerspace_user_links.bar.facilitators:
+  title: 'Facilitators'
+  description: 'Who is on duty, and your appointments with them.'
+  route_name: '<nolink>'
   menu_name: member-nav
   weight: 10
   options:
     attributes:
-      data-icon: person-badge
+      data-icon: person-check
 
-makerspace_user_links.bar.badges:
-  title: 'Badges'
-  route_name: user_current_paths.wildcardaction_redirect
-  route_parameters:
-    wildcardaction: badges
+makerspace_user_links.bar.schedule:
+  title: "Who's on"
+  description: 'Facilitator schedule: who is on duty when.'
+  route_name: view.facilitator_schedules.facilitator_schedule
   menu_name: member-nav
-  weight: 20
+  parent: makerspace_user_links.bar.facilitators
+  weight: 0
   options:
     attributes:
-      data-icon: award
+      data-icon: clock
 
 makerspace_user_links.bar.appointments:
-  title: 'Appointments'
+  title: 'My appointments'
+  description: 'Badge checkouts and help sessions you have booked.'
   route_name: appointment_facilitator.appointments_dashboard
   menu_name: member-nav
-  weight: 30
+  parent: makerspace_user_links.bar.facilitators
+  weight: 10
   options:
     attributes:
       data-icon: calendar-check
 
-makerspace_user_links.bar.events:
-  title: 'Events'
-  route_name: view.event_set.all_upcoming
+makerspace_user_links.bar.membership:
+  title: 'My Membership'
+  description: 'Your account, billing, badges and membership options.'
+  route_name: entity.node.canonical
+  route_parameters:
+    node: '5737'
   menu_name: member-nav
-  weight: 40
+  weight: 20
   options:
     attributes:
-      data-icon: calendar-event
+      data-icon: person-badge
 
-makerspace_user_links.bar.equipment:
-  title: 'Equipment'
-  route_name: view.equipment.page_1
+makerspace_user_links.bar.home:
+  # Not "Home": on the public site that reads as the public homepage.
+  title: 'Member Resources'
+  description: 'Store, printing, rooms, storage, volunteering and more.'
+  route_name: entity.node.canonical
+  route_parameters:
+    node: '619'
   menu_name: member-nav
-  weight: 50
+  weight: 30
   options:
     attributes:
-      data-icon: tools
-
-# Second-most-clicked destination from the member hub (GA, Jul-Oct 2026):
-# members check who is on duty before coming in.
-makerspace_user_links.bar.schedule:
-  # Short label so the bar keeps its labels at 1366px; the description is the
-  # tooltip.
-  title: "Who's On"
-  description: 'Facilitator schedule: who is on duty'
-  route_name: view.facilitator_schedules.facilitator_schedule
-  menu_name: member-nav
-  weight: 35
-  options:
-    attributes:
-      data-icon: person-check
+      data-icon: grid
 
 makerspace_user_links.account.profile:
   title: 'My profile'
@@ -291,3 +286,134 @@ makerspace_user_links.account.logout:
   options:
     attributes:
       data-icon: box-arrow-right
+
+# My Membership page (node 5737) cards, rendered by a makerspace_role_menu_cards
+# block. The page used to borrow the hub's menu block, which hides itself
+# there (it follows an active trail the page is not on), so members saw only
+# the membership banner. Everything a member manages about their own account
+# and membership, in one place.
+makerspace_user_links.membership.profile:
+  title: 'My member profile'
+  description: 'Photo, bio, interests and skills.'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: main
+  menu_name: member-membership
+  weight: 0
+  options:
+    attributes:
+      data-icon: person-vcard
+
+makerspace_user_links.membership.badges:
+  title: 'My badges'
+  description: 'Badges you hold and ones in progress.'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: badges
+  menu_name: member-membership
+  weight: 5
+  options:
+    attributes:
+      data-icon: award
+
+makerspace_user_links.membership.settings:
+  title: 'Account settings'
+  description: 'Email, password and login.'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: edit
+  menu_name: member-membership
+  weight: 10
+  options:
+    attributes:
+      data-icon: gear
+
+makerspace_user_links.membership.billing:
+  title: 'Billing, pause or cancel'
+  description: 'Payment card, plan, pausing or cancelling.'
+  route_name: chargebee_portal.payment_portal
+  menu_name: member-membership
+  weight: 20
+  options:
+    attributes:
+      data-icon: credit-card
+
+makerspace_user_links.membership.purchases:
+  title: 'My purchases'
+  description: 'Store, printing and other charges, with receipts.'
+  route_name: mh_stripe.my_purchases
+  menu_name: member-membership
+  weight: 30
+  options:
+    attributes:
+      data-icon: receipt
+
+makerspace_user_links.membership.storage:
+  title: 'My storage'
+  description: 'Units you hold; claim or release one.'
+  route_name: storage_manager.member_dashboard
+  menu_name: member-membership
+  weight: 40
+  options:
+    attributes:
+      data-icon: box-seam
+
+makerspace_user_links.membership.borrowed:
+  title: 'Borrowed tools'
+  description: 'Lending library loans and due dates.'
+  url: 'internal:/library/borrowed'
+  menu_name: member-membership
+  weight: 50
+  options:
+    attributes:
+      data-icon: bag-check
+
+makerspace_user_links.membership.household:
+  title: 'Add a household member'
+  description: 'Invite someone at your address to join.'
+  url: 'internal:/node/24988'
+  menu_name: member-membership
+  weight: 60
+  options:
+    attributes:
+      data-icon: people
+
+makerspace_user_links.membership.increase:
+  title: 'Increase my payment'
+  description: 'Pay more to support MakeHaven.'
+  url: 'internal:/increase'
+  menu_name: member-membership
+  weight: 70
+  options:
+    attributes:
+      data-icon: graph-up-arrow
+
+makerspace_user_links.membership.sliding_scale:
+  title: 'Sliding scale'
+  description: 'Request or renew a reduced, income-based rate.'
+  url: 'internal:/node/25293'
+  menu_name: member-membership
+  weight: 80
+  options:
+    attributes:
+      data-icon: sliders
+
+makerspace_user_links.membership.sms:
+  title: 'Text message settings'
+  description: 'Choose whether we can text you.'
+  url: 'internal:/user/sms'
+  menu_name: member-membership
+  weight: 90
+  options:
+    attributes:
+      data-icon: chat-dots
+
+makerspace_user_links.membership.referrals:
+  title: 'Refer a friend'
+  description: 'Earn credit when someone you invite joins.'
+  route_name: makerspace_referrals.my
+  menu_name: member-membership
+  weight: 100
+  options:
+    attributes:
+      data-icon: person-plus

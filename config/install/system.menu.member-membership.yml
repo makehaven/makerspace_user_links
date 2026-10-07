@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - makerspace_user_links
+id: member-membership
+label: 'My Membership'
+description: 'Account and membership cards on the My Membership page.'
+locked: true
