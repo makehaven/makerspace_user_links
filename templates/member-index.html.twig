@@ -1,0 +1,36 @@
+{#
+/**
+ * @file
+ * Member Resources index (MemberIndexBlock).
+ *
+ * The ul.menu / span / ul.menu > li shape is what the type-to-filter box
+ * (makerspace_member_navigator menu-filter.js) reads; the description sits
+ * inside the link so typed words match it too. No menu-item classes: the
+ * member theme styles those as cards.
+ *
+ * Available variables:
+ * - sections: list of { area, title, links: [{ title, url, description, icon }] }.
+ */
+#}
+<div class="mh-member-index">
+  <ul class="menu mh-member-index__sections">
+    {% for section in sections %}
+      <li class="mh-member-index__section">
+        <span class="mh-member-index__heading"><small>{{ section.area }}</small> {{ section.title }}</span>
+        <ul class="menu mh-member-index__links">
+          {% for link in section.links %}
+            <li class="mh-member-index__item">
+              <a href="{{ link.url }}">
+                <span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>
+                <span class="mh-member-index__text">
+                  <strong>{{ link.title }}</strong>
+                  {% if link.description %}<span class="mh-member-index__desc">{{ link.description }}</span>{% endif %}
+                </span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

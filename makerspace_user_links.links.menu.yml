@@ -443,6 +443,28 @@ makerspace_user_links.make.printing:
     attributes:
       data-icon: printer
 
+makerspace_user_links.make.print_manager:
+  title: 'Print manager'
+  description: 'Release and manage your print jobs.'
+  route_name: savapage_auth.launch
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 11
+  options:
+    attributes:
+      data-icon: printer-fill
+
+makerspace_user_links.make.print_funds:
+  title: 'Add printing funds'
+  description: 'Top up your printing balance.'
+  route_name: savapage_auth.topup
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 12
+  options:
+    attributes:
+      data-icon: cash-coin
+
 makerspace_user_links.make.library:
   title: 'Lending library'
   description: 'Borrow tools to take home.'
@@ -684,6 +706,17 @@ makerspace_user_links.learn.air:
     attributes:
       data-icon: wind
 
+makerspace_user_links.learn.logos:
+  title: 'Logos and branding'
+  description: 'MakeHaven logos and graphics for download.'
+  url: 'https://drive.google.com/drive/u/1/folders/0B7G56jocgKULMUoyY2hIODNwQUk?resourcekey=0-eXyJv1iHpb8yFfiZ4WXlxA'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_reference
+  weight: 40
+  options:
+    attributes:
+      data-icon: badge-tm
+
 makerspace_user_links.connect.group_volunteer:
   title: 'Volunteer'
   route_name: '<nolink>'
@@ -766,6 +799,28 @@ makerspace_user_links.connect.leadership:
   options:
     attributes:
       data-icon: diagram-3
+
+makerspace_user_links.connect.reimbursement:
+  title: 'Request reimbursement'
+  description: 'Get paid back for things you bought for MakeHaven.'
+  url: 'base:reimbursement'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 70
+  options:
+    attributes:
+      data-icon: receipt-cutoff
+
+makerspace_user_links.connect.support:
+  title: 'Support MakeHaven'
+  description: 'Donate, sponsor or help in other ways.'
+  url: 'internal:/how-you-can-help-makehaven'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 80
+  options:
+    attributes:
+      data-icon: heart
 
 makerspace_user_links.connect.group_community:
   title: 'Community'

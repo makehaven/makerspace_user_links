@@ -41,3 +41,12 @@ member_bar:
     - core/drupal
     - core/once
     - makerspace_user_links/bootstrap_icons
+
+member_index:
+  # Bump on every CSS change: the aggregate filename ignores file contents.
+  version: '1.0'
+  css:
+    theme:
+      css/member-index.css: {}
+  dependencies:
+    - makerspace_user_links/bootstrap_icons

@@ -36,6 +36,12 @@ function makerspace_user_links_theme(): array {
       ],
       'template' => 'member-attention',
     ],
+    'makerspace_user_links_member_index' => [
+      'variables' => [
+        'sections' => [],
+      ],
+      'template' => 'member-index',
+    ],
     'makerspace_user_links_member_bar' => [
       'variables' => [
         'home_url' => '',
