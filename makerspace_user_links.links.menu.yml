@@ -123,6 +123,7 @@ makerspace_user_links.bar.make:
   menu_name: member-nav
   weight: 0
   options:
+    mh_quick_menu: journey-make
     attributes:
       data-icon: hammer
 
@@ -133,6 +134,7 @@ makerspace_user_links.bar.learn:
   menu_name: member-nav
   weight: 10
   options:
+    mh_quick_menu: journey-learn
     attributes:
       data-icon: mortarboard
 
@@ -143,6 +145,7 @@ makerspace_user_links.bar.connect:
   menu_name: member-nav
   weight: 20
   options:
+    mh_quick_menu: journey-connect
     attributes:
       data-icon: people
 
@@ -153,6 +156,7 @@ makerspace_user_links.bar.grow:
   menu_name: member-nav
   weight: 30
   options:
+    mh_quick_menu: journey-grow
     mh_access_callback: '\Drupal\makerspace_user_links\Access\GrowAccess::visible'
     attributes:
       data-icon: graph-up-arrow
@@ -379,6 +383,7 @@ makerspace_user_links.make.tools:
   parent: makerspace_user_links.make.group_shop
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: tools
 
@@ -390,6 +395,7 @@ makerspace_user_links.make.whos_on:
   parent: makerspace_user_links.make.group_shop
   weight: 10
   options:
+    mh_quick: true
     attributes:
       data-icon: person-check
 
@@ -401,6 +407,7 @@ makerspace_user_links.make.reservations:
   parent: makerspace_user_links.make.group_shop
   weight: 20
   options:
+    mh_quick: true
     attributes:
       data-icon: calendar-plus
 
@@ -429,6 +436,7 @@ makerspace_user_links.make.store:
   parent: makerspace_user_links.make.group_materials
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: bag
 
@@ -440,6 +448,7 @@ makerspace_user_links.make.printing:
   parent: makerspace_user_links.make.group_materials
   weight: 10
   options:
+    mh_quick: true
     attributes:
       data-icon: printer
 
@@ -592,6 +601,7 @@ makerspace_user_links.learn.my_badges:
   parent: makerspace_user_links.learn.group_badges
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: award
 
@@ -603,6 +613,7 @@ makerspace_user_links.learn.complete:
   parent: makerspace_user_links.learn.group_badges
   weight: 10
   options:
+    mh_quick: true
     attributes:
       data-icon: check2-circle
 
@@ -614,6 +625,7 @@ makerspace_user_links.learn.appointments:
   parent: makerspace_user_links.learn.group_badges
   weight: 20
   options:
+    mh_quick: true
     attributes:
       data-icon: calendar-check
 
@@ -642,6 +654,7 @@ makerspace_user_links.learn.classes:
   parent: makerspace_user_links.learn.group_classes
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: calendar-event
 
@@ -731,6 +744,7 @@ makerspace_user_links.connect.board:
   parent: makerspace_user_links.connect.group_volunteer
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: hand-thumbs-up
 
@@ -836,6 +850,7 @@ makerspace_user_links.connect.members:
   parent: makerspace_user_links.connect.group_community
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: people
 
@@ -847,6 +862,7 @@ makerspace_user_links.connect.slack:
   parent: makerspace_user_links.connect.group_community
   weight: 10
   options:
+    mh_quick: true
     attributes:
       data-icon: slack
 
@@ -908,6 +924,7 @@ makerspace_user_links.connect.refer:
   parent: makerspace_user_links.connect.group_invite
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: person-plus
 
@@ -936,6 +953,7 @@ makerspace_user_links.grow.dashboard:
   parent: makerspace_user_links.grow.group_business
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: briefcase
 
@@ -947,6 +965,7 @@ makerspace_user_links.grow.list:
   parent: makerspace_user_links.grow.group_business
   weight: 10
   options:
+    mh_quick: true
     attributes:
       data-icon: shop
 
@@ -964,6 +983,7 @@ makerspace_user_links.grow.shop_local:
   parent: makerspace_user_links.grow.group_sell
   weight: 0
   options:
+    mh_quick: true
     attributes:
       data-icon: basket
 

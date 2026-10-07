@@ -88,6 +88,9 @@ class MemberBar implements TrustedCallbackInterface {
       '#theme' => 'makerspace_user_links_member_bar',
       '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => 619])->toString(),
       '#site_url' => Url::fromRoute('<front>')->toString(),
+      // The bar's search box submits to the Member Resources index, whose
+      // type-to-filter box (makerspace_member_navigator) reads ?q.
+      '#search_url' => Url::fromRoute('entity.node.canonical', ['node' => 619])->toString(),
       '#primary' => $this->links('member-nav', $current),
       '#dashboards' => $this->links('your-dashboards', $current),
       '#account' => $this->links('member-account', $current),
@@ -104,9 +107,10 @@ class MemberBar implements TrustedCallbackInterface {
   /**
    * Returns a menu's links that the current user can reach, two levels deep.
    *
-   * A top-level link with children renders as a dropdown in the bar (for
-   * example Facilitators: Who's On, My appointments). A parent that points
-   * nowhere (`<nolink>`) and has no reachable children is dropped.
+   * A top-level link with children renders as a dropdown in the bar. A
+   * parent that points nowhere (`<nolink>`) and has no reachable children is
+   * dropped. A parent that points somewhere keeps that as the dropdown's
+   * first entry ("All of Make").
    *
    * @return array
    *   A list of links, each keyed title, description, url (empty for
@@ -155,6 +159,13 @@ class MemberBar implements TrustedCallbackInterface {
         continue;
       }
       $children = ($recurse && $element->subtree) ? $this->buildLinks($element->subtree, $current_path, FALSE) : [];
+      // A journey link lists its most-used destinations as a dropdown, so
+      // Tools, My badges or Who's on are one click from any page without
+      // opening the journey page first. The journey menu marks them with
+      // `mh_quick: true`; the bar link names the menu in `mh_quick_menu`.
+      if ($recurse && !$children && !empty($options['mh_quick_menu'])) {
+        $children = $this->quickLinks((string) $options['mh_quick_menu'], $current_path);
+      }
       if ($nolink && !$children) {
         continue;
       }
@@ -172,6 +183,27 @@ class MemberBar implements TrustedCallbackInterface {
       ];
     }
     return $links;
+  }
+
+  /**
+   * Returns the links a journey menu flags with `mh_quick: true`, in order.
+   */
+  protected function quickLinks(string $menu_name, string $current_path): array {
+    $parameters = (new MenuTreeParameters())->setMaxDepth(2)->onlyEnabledLinks();
+    $tree = $this->menuTree->load($menu_name, $parameters);
+    $tree = $this->menuTree->transform($tree, [
+      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+    ]);
+    $quick = [];
+    foreach ($tree as $element) {
+      foreach ($element->subtree ?: [$element] as $leaf) {
+        if (!empty($leaf->link->getOptions()['mh_quick'])) {
+          $quick = array_merge($quick, $this->buildLinks([$leaf], $current_path, FALSE));
+        }
+      }
+    }
+    return $quick;
   }
 
 }

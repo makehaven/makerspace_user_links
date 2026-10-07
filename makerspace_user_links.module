@@ -46,6 +46,7 @@ function makerspace_user_links_theme(): array {
       'variables' => [
         'home_url' => '',
         'site_url' => '',
+        'search_url' => '',
         'primary' => [],
         'dashboards' => [],
         'account' => [],

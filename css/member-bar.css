@@ -132,6 +132,55 @@
   min-width: 17rem;
 }
 
+/* Search: an input at desktop widths, an icon link on phones. */
+.mh-member-bar__search {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0.25rem;
+  padding: 0 0.6rem;
+  border-radius: 999px;
+  background: var(--mhb-hover);
+}
+
+.mh-member-bar__search input {
+  width: 9rem;
+  padding: 0.35rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--mhb-fg);
+  font: inherit;
+  font-size: 0.875rem;
+  outline: 0;
+}
+
+.mh-member-bar__search input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.mh-member-bar__search:focus-within {
+  background: #fff;
+  color: var(--mhb-panel-fg);
+}
+
+.mh-member-bar__search:focus-within input {
+  color: var(--mhb-panel-fg);
+}
+
+.mh-member-bar__search:focus-within input::placeholder {
+  color: var(--mh-color-neutral-500, #7c7c7c);
+}
+
+.mh-member-bar .mh-member-bar__search-link {
+  display: none;
+}
+
+.mh-member-bar__panel-head {
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--mhb-border);
+}
+
 .mh-member-bar__caret {
   font-size: 0.7rem;
   opacity: 0.8;
@@ -247,7 +296,15 @@
 
 /* When the labels do not fit (member-bar.js measures), links shrink to
    icons in two steps; the labels stay for screen readers, and the title
-   attribute shows them on hover. */
+   attribute shows them on hover. The search input gives way first. */
+.mh-member-bar.is-tight .mh-member-bar__search {
+  display: none;
+}
+
+.mh-member-bar.is-tight .mh-member-bar__search-link {
+  display: inline-flex;
+}
+
 .mh-member-bar.is-tight .mh-member-bar__end .mh-member-bar__label,
 .mh-member-bar.is-compact .mh-member-bar__primary .mh-member-bar__label {
   position: absolute;
@@ -262,8 +319,13 @@
   .mh-member-bar__primary,
   .mh-member-bar__dashboards,
   .mh-member-bar__name,
+  .mh-member-bar__search,
   .mh-member-bar__site .mh-member-bar__label {
     display: none;
+  }
+
+  .mh-member-bar .mh-member-bar__search-link {
+    display: inline-flex;
   }
 
   .mh-member-bar__menu-toggle {
