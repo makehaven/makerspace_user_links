@@ -72,6 +72,7 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
     return [
       'menu' => '',
       'default_icon' => 'grid',
+      'groups' => FALSE,
     ] + parent::defaultConfiguration();
   }
 
@@ -92,6 +93,12 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
       '#description' => $this->t('Used for links that do not set their own <code>data-icon</code>. E.g. <code>grid</code>, <code>speedometer2</code>.'),
       '#default_value' => $this->configuration['default_icon'],
     ];
+    $form['groups'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show child links as titled groups'),
+      '#description' => $this->t('A top-level link with children renders as a heading with its children as cards (e.g. a "Billing" group). Off: only top-level links render.'),
+      '#default_value' => $this->configuration['groups'],
+    ];
     return $form;
   }
 
@@ -101,6 +108,7 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
   public function blockSubmit($form, FormStateInterface $form_state): void {
     $this->configuration['menu'] = $form_state->getValue('menu');
     $this->configuration['default_icon'] = $form_state->getValue('default_icon') ?: 'grid';
+    $this->configuration['groups'] = (bool) $form_state->getValue('groups');
   }
 
   /**
@@ -112,8 +120,10 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
       return [];
     }
 
-    // Top-level items only; access-filtered so unreachable cards drop out.
-    $parameters = (new MenuTreeParameters())->setMaxDepth(1)->onlyEnabledLinks();
+    // Access-filtered so unreachable cards drop out. With 'groups' on, a
+    // top-level link with children becomes a titled group of cards.
+    $groups_on = !empty($this->configuration['groups']);
+    $parameters = (new MenuTreeParameters())->setMaxDepth($groups_on ? 2 : 1)->onlyEnabledLinks();
     $tree = $this->menuTree->load($menu_name, $parameters);
     $tree = $this->menuTree->transform($tree, [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
@@ -121,47 +131,63 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
     ]);
 
     $cards = [];
+    $groups = [];
     foreach ($tree as $element) {
-      if (!$element->access || !$element->access->isAllowed()) {
+      if ($groups_on && $element->subtree) {
+        $children = array_filter(array_map([$this, 'card'], $element->subtree));
+        if ($children && ($element->access && $element->access->isAllowed())) {
+          $groups[] = ['title' => $element->link->getTitle(), 'cards' => array_values($children)];
+        }
         continue;
       }
-      $link = $element->link;
-      $options = $link->getOptions();
-
-      // Some destinations gate access internally rather than at the Drupal
-      // route level (e.g. CiviCRM's /civicrm is `_access: TRUE` and enforces
-      // its own permissions), so the menu access-filter above cannot hide
-      // them. A link may declare `options.mh_access_permission` to require a
-      // Drupal permission before its card renders.
-      $required_permission = $options['mh_access_permission'] ?? NULL;
-      if ($required_permission && !$this->currentUser->hasPermission($required_permission)) {
-        continue;
+      if ($card = $this->card($element)) {
+        $cards[] = $card;
       }
-
-      $url = $link->getUrlObject();
-      $icon = $options['attributes']['data-icon'] ?? $this->configuration['default_icon'];
-
-      $cards[] = [
-        'title' => $link->getTitle(),
-        'url' => $url->toString(),
-        'description' => (string) $link->getDescription(),
-        'icon' => preg_replace('/[^a-z0-9-]/', '', (string) $icon),
-      ];
     }
 
-    if (!$cards) {
+    if (!$cards && !$groups) {
       return [];
     }
 
     return [
       '#theme' => 'makerspace_user_links_menu_cards',
-      '#title' => $this->label(),
+      // With only groups, their headings say it; the block title would repeat.
+      '#title' => $cards ? $this->label() : '',
       '#cards' => $cards,
+      '#groups' => $groups,
       '#attached' => ['library' => ['makerspace_user_links/menu_cards']],
       '#cache' => [
         'contexts' => ['user.permissions', 'user.roles', 'route'],
         'tags' => ['config:system.menu.' . $menu_name],
       ],
+    ];
+  }
+
+  /**
+   * Returns one card for a menu tree element, or NULL if it should not show.
+   *
+   * Some destinations gate access internally rather than at the Drupal route
+   * level (e.g. CiviCRM's /civicrm is `_access: TRUE` and enforces its own
+   * permissions), so the menu access-filter cannot hide them. A link may
+   * declare `options.mh_access_permission` to require a Drupal permission
+   * before its card renders.
+   */
+  protected function card($element): ?array {
+    if (!$element->access || !$element->access->isAllowed()) {
+      return NULL;
+    }
+    $link = $element->link;
+    $options = $link->getOptions();
+    $required_permission = $options['mh_access_permission'] ?? NULL;
+    if ($required_permission && !$this->currentUser->hasPermission($required_permission)) {
+      return NULL;
+    }
+    $icon = $options['attributes']['data-icon'] ?? $this->configuration['default_icon'];
+    return [
+      'title' => $link->getTitle(),
+      'url' => $link->getUrlObject()->toString(),
+      'description' => (string) $link->getDescription(),
+      'icon' => preg_replace('/[^a-z0-9-]/', '', (string) $icon),
     ];
   }
 

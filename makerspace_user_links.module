@@ -26,6 +26,7 @@ function makerspace_user_links_theme(): array {
       'variables' => [
         'title' => '',
         'cards' => [],
+        'groups' => [],
       ],
       'template' => 'menu-cards',
     ],
@@ -43,6 +44,8 @@ function makerspace_user_links_theme(): array {
         'dashboards' => [],
         'account' => [],
         'display_name' => '',
+        'membership_url' => '',
+        'membership_active' => FALSE,
       ],
       'template' => 'member-bar',
     ],

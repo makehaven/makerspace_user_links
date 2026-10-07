@@ -37,12 +37,18 @@ staff roles (administrator, manager, special, librarian, event_management,
 data) keep core's Navigation sidebar. Members, borrowers, facilitators,
 instructors and content editors rely on the bar.
 
-- Links come from three menus, all access-filtered: `member-nav` (primary),
-  `your-dashboards` (the "Dashboards" dropdown; also the hub's role cards) and
-  `member-account` (profile, billing, log out). They are code-defined in
-  `makerspace_user_links.links.menu.yml`; staff can reorder or disable them in
-  the menu UI. Give every link a `data-icon` (Bootstrap Icons name): on narrow
-  screens the primary links show icons only.
+- Links come from access-filtered menus defined in
+  `makerspace_user_links.links.menu.yml` (staff can reorder or disable them
+  in the menu UI): `member-nav` (Tools, Facilitators ▾, Member Resources; a
+  link with children renders as a dropdown), `your-dashboards` (the
+  "Dashboards" dropdown and the hub's role cards) and `member-account` (only
+  the buttons beside the name: Switch back while masquerading, Log out).
+  The viewer's NAME opens My Membership (node 5737), whose grouped cards come
+  from `member-membership` via a `makerspace_role_menu_cards` block with
+  "groups" on. Give every link a `data-icon` (Bootstrap Icons name).
+- Shape decided with staff 2026-10-06: members start from Tools and reach
+  badges through a tool; appointments sit with the facilitator schedule;
+  events are public and stay on the public site.
 - `options.mh_access_permission` hides a link from anyone without that
   permission, for destinations whose route does not gate access (CiviCRM) or
   is too broad (members hold `access administration pages`).

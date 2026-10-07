@@ -167,18 +167,6 @@ makerspace_user_links.bar.appointments:
     attributes:
       data-icon: calendar-check
 
-makerspace_user_links.bar.membership:
-  title: 'My Membership'
-  description: 'Your account, billing, badges and membership options.'
-  route_name: entity.node.canonical
-  route_parameters:
-    node: '5737'
-  menu_name: member-nav
-  weight: 20
-  options:
-    attributes:
-      data-icon: person-badge
-
 makerspace_user_links.bar.home:
   # Not "Home": on the public site that reads as the public homepage.
   title: 'Member Resources'
@@ -191,83 +179,6 @@ makerspace_user_links.bar.home:
   options:
     attributes:
       data-icon: grid
-
-makerspace_user_links.account.profile:
-  title: 'My profile'
-  route_name: user_current_paths.wildcardaction_redirect
-  route_parameters:
-    wildcardaction: main
-  menu_name: member-account
-  weight: 0
-  options:
-    attributes:
-      data-icon: person
-
-makerspace_user_links.account.settings:
-  title: 'Account settings'
-  route_name: user_current_paths.wildcardaction_redirect
-  route_parameters:
-    wildcardaction: edit
-  menu_name: member-account
-  weight: 10
-  options:
-    attributes:
-      data-icon: gear
-
-makerspace_user_links.account.billing:
-  title: 'Billing'
-  route_name: chargebee_portal.payment_portal
-  menu_name: member-account
-  weight: 20
-  options:
-    attributes:
-      data-icon: credit-card
-
-makerspace_user_links.account.purchases:
-  title: 'My purchases'
-  route_name: mh_stripe.my_purchases
-  menu_name: member-account
-  weight: 30
-  options:
-    attributes:
-      data-icon: receipt
-
-makerspace_user_links.account.storage:
-  title: 'My storage'
-  route_name: storage_manager.member_dashboard
-  menu_name: member-account
-  weight: 40
-  options:
-    attributes:
-      data-icon: box-seam
-
-makerspace_user_links.account.borrowed:
-  title: 'Borrowed tools'
-  url: 'internal:/library/borrowed'
-  menu_name: member-account
-  weight: 45
-  options:
-    attributes:
-      data-icon: bag-check
-
-makerspace_user_links.account.help:
-  title: 'Help & FAQ'
-  url: 'internal:/member-faq'
-  menu_name: member-account
-  weight: 60
-  options:
-    attributes:
-      data-icon: question-circle
-
-makerspace_user_links.account.create:
-  title: 'Create a post'
-  description: 'Projects, wishes, resources and your business profile.'
-  route_name: node.add_page
-  menu_name: member-account
-  weight: 50
-  options:
-    attributes:
-      data-icon: plus-circle
 
 makerspace_user_links.account.unmasquerade:
   title: 'Switch back'
@@ -288,21 +199,35 @@ makerspace_user_links.account.logout:
       data-icon: box-arrow-right
 
 # My Membership page (node 5737) cards, rendered by a makerspace_role_menu_cards
-# block. The page used to borrow the hub's menu block, which hides itself
-# there (it follows an active trail the page is not on), so members saw only
-# the membership banner. Everything a member manages about their own account
-# and membership, in one place.
-makerspace_user_links.membership.profile:
-  title: 'My member profile'
-  description: 'Photo, bio, interests and skills.'
-  route_name: user_current_paths.wildcardaction_redirect
-  route_parameters:
-    wildcardaction: main
+# block with "groups" on: each top-level <nolink> item is a heading and its
+# children are the cards. The page used to borrow the hub's menu block, which
+# hides itself there (it follows an active trail the page is not on), so
+# members saw only the membership banner. Grouped by what a member is trying
+# to do (JR 2026-10-06): billing in one place, profile and login together,
+# household and referrals together.
+makerspace_user_links.membership.group_activity:
+  title: 'Your activity'
+  route_name: '<nolink>'
   menu_name: member-membership
   weight: 0
-  options:
-    attributes:
-      data-icon: person-vcard
+
+makerspace_user_links.membership.group_account:
+  title: 'Profile & account'
+  route_name: '<nolink>'
+  menu_name: member-membership
+  weight: 10
+
+makerspace_user_links.membership.group_billing:
+  title: 'Billing'
+  route_name: '<nolink>'
+  menu_name: member-membership
+  weight: 20
+
+makerspace_user_links.membership.group_invite:
+  title: 'Invite someone'
+  route_name: '<nolink>'
+  menu_name: member-membership
+  weight: 30
 
 makerspace_user_links.membership.badges:
   title: 'My badges'
@@ -311,18 +236,66 @@ makerspace_user_links.membership.badges:
   route_parameters:
     wildcardaction: badges
   menu_name: member-membership
-  weight: 5
+  parent: makerspace_user_links.membership.group_activity
+  weight: 0
   options:
     attributes:
       data-icon: award
 
+makerspace_user_links.membership.storage:
+  title: 'My storage'
+  description: 'Units you hold; claim or release one.'
+  route_name: storage_manager.member_dashboard
+  menu_name: member-membership
+  parent: makerspace_user_links.membership.group_activity
+  weight: 10
+  options:
+    attributes:
+      data-icon: box-seam
+
+makerspace_user_links.membership.borrowed:
+  title: 'Borrowed tools'
+  description: 'Lending library loans and due dates.'
+  url: 'internal:/library/borrowed'
+  menu_name: member-membership
+  parent: makerspace_user_links.membership.group_activity
+  weight: 20
+  options:
+    attributes:
+      data-icon: bag-check
+
+makerspace_user_links.membership.share:
+  title: 'Share something'
+  description: 'Post a project, a wish, a resource or your business.'
+  route_name: node.add_page
+  menu_name: member-membership
+  parent: makerspace_user_links.membership.group_activity
+  weight: 30
+  options:
+    attributes:
+      data-icon: plus-circle
+
+makerspace_user_links.membership.profile:
+  title: 'My member profile'
+  description: 'Photo, bio, interests and skills others see.'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: main
+  menu_name: member-membership
+  parent: makerspace_user_links.membership.group_account
+  weight: 0
+  options:
+    attributes:
+      data-icon: person-vcard
+
 makerspace_user_links.membership.settings:
-  title: 'Account settings'
-  description: 'Email, password and login.'
+  title: 'Login, email and texts'
+  description: 'Email, password, and whether we can text you (SMS Consent tab).'
   route_name: user_current_paths.wildcardaction_redirect
   route_parameters:
     wildcardaction: edit
   menu_name: member-membership
+  parent: makerspace_user_links.membership.group_account
   weight: 10
   options:
     attributes:
@@ -333,7 +306,8 @@ makerspace_user_links.membership.billing:
   description: 'Payment card, plan, pausing or cancelling.'
   route_name: chargebee_portal.payment_portal
   menu_name: member-membership
-  weight: 20
+  parent: makerspace_user_links.membership.group_billing
+  weight: 0
   options:
     attributes:
       data-icon: credit-card
@@ -343,47 +317,19 @@ makerspace_user_links.membership.purchases:
   description: 'Store, printing and other charges, with receipts.'
   route_name: mh_stripe.my_purchases
   menu_name: member-membership
-  weight: 30
+  parent: makerspace_user_links.membership.group_billing
+  weight: 10
   options:
     attributes:
       data-icon: receipt
-
-makerspace_user_links.membership.storage:
-  title: 'My storage'
-  description: 'Units you hold; claim or release one.'
-  route_name: storage_manager.member_dashboard
-  menu_name: member-membership
-  weight: 40
-  options:
-    attributes:
-      data-icon: box-seam
-
-makerspace_user_links.membership.borrowed:
-  title: 'Borrowed tools'
-  description: 'Lending library loans and due dates.'
-  url: 'internal:/library/borrowed'
-  menu_name: member-membership
-  weight: 50
-  options:
-    attributes:
-      data-icon: bag-check
-
-makerspace_user_links.membership.household:
-  title: 'Add a household member'
-  description: 'Invite someone at your address to join.'
-  url: 'internal:/node/24988'
-  menu_name: member-membership
-  weight: 60
-  options:
-    attributes:
-      data-icon: people
 
 makerspace_user_links.membership.increase:
   title: 'Increase my payment'
   description: 'Pay more to support MakeHaven.'
   url: 'internal:/increase'
   menu_name: member-membership
-  weight: 70
+  parent: makerspace_user_links.membership.group_billing
+  weight: 20
   options:
     attributes:
       data-icon: graph-up-arrow
@@ -393,27 +339,30 @@ makerspace_user_links.membership.sliding_scale:
   description: 'Request or renew a reduced, income-based rate.'
   url: 'internal:/node/25293'
   menu_name: member-membership
-  weight: 80
+  parent: makerspace_user_links.membership.group_billing
+  weight: 30
   options:
     attributes:
       data-icon: sliders
 
-makerspace_user_links.membership.sms:
-  title: 'Text message settings'
-  description: 'Choose whether we can text you.'
-  url: 'internal:/user/sms'
+makerspace_user_links.membership.household:
+  title: 'Add a household member'
+  description: 'Someone at your address joins on your membership.'
+  url: 'internal:/node/24988'
   menu_name: member-membership
-  weight: 90
+  parent: makerspace_user_links.membership.group_invite
+  weight: 0
   options:
     attributes:
-      data-icon: chat-dots
+      data-icon: people
 
 makerspace_user_links.membership.referrals:
   title: 'Refer a friend'
   description: 'Earn credit when someone you invite joins.'
   route_name: makerspace_referrals.my
   menu_name: member-membership
-  weight: 100
+  parent: makerspace_user_links.membership.group_invite
+  weight: 10
   options:
     attributes:
       data-icon: person-plus

@@ -6,12 +6,15 @@
  * Available variables:
  * - title: the block label (section heading).
  * - cards: list of { title, url, description, icon } (icon = Bootstrap Icons name).
+ * - groups: list of { title, cards } shown after the loose cards, each under
+ *   its own heading (block setting "Show child links as titled groups").
  */
 #}
 <section class="mh-menu-cards">
   {% if title %}
     <h2 class="mh-menu-cards__title">{{ title }}</h2>
   {% endif %}
+  {% if cards %}
   <div class="mh-menu-cards__grid">
     {% for card in cards %}
       <a href="{{ card.url }}" class="mh-menu-cards__card">
@@ -23,4 +26,19 @@
       </a>
     {% endfor %}
   </div>
+  {% endif %}
+  {% for group in groups %}
+    <h3 class="mh-menu-cards__group">{{ group.title }}</h3>
+    <div class="mh-menu-cards__grid">
+      {% for card in group.cards %}
+        <a href="{{ card.url }}" class="mh-menu-cards__card">
+          <span class="mh-menu-cards__icon bi bi-{{ card.icon }}" aria-hidden="true"></span>
+          <span class="mh-menu-cards__label">{{ card.title }}</span>
+          {% if card.description %}
+            <span class="mh-menu-cards__desc">{{ card.description }}</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  {% endfor %}
 </section>

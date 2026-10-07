@@ -9,7 +9,9 @@
  * - primary, dashboards, account: lists of
  *   { title, description, url, icon, active, children }. A primary link with
  *   children renders as a dropdown (a labelled group in the phone menu).
- * - display_name: the viewer's name, labels the account menu.
+ * - display_name: the viewer's name; links to My Membership.
+ * - membership_url, membership_active: My Membership (node 5737).
+ * - account: action buttons beside the name (switch back, log out).
  */
 #}
 <nav class="mh-member-bar" aria-label="{{ 'Member'|t }}">
@@ -96,18 +98,16 @@
         <span class="bi bi-globe2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Website'|t }}</span>
       </a>
 
-      <details class="mh-member-bar__drop mh-member-bar__account">
-        <summary>
-          <span class="bi bi-person-circle" aria-hidden="true"></span>
-          <span class="mh-member-bar__name">{{ display_name }}</span>
-        </summary>
-        <ul class="mh-member-bar__panel mh-member-bar__list">
-          {% for link in account %}
-            <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-              {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
-          {% endfor %}
-        </ul>
-      </details>
+      <a class="mh-member-bar__me" href="{{ membership_url }}" title="{{ 'My Membership: profile, billing, badges'|t }}"{{ membership_active ? ' aria-current="page"' }}>
+        <span class="bi bi-person-circle" aria-hidden="true"></span>
+        <span class="mh-member-bar__name">{{ display_name }}</span>
+      </a>
+
+      {% for link in account %}
+        <a class="mh-member-bar__action" href="{{ link.url }}" title="{{ link.title }}">
+          {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__action-label">{{ link.title }}</span>
+        </a>
+      {% endfor %}
     </div>
   </div>
 </nav>

@@ -171,6 +171,25 @@
   margin-left: auto;
 }
 
+/* Name → My Membership; the actions beside it (log out, switch back) show
+   an icon only, with the label kept for screen readers and the tooltip. */
+.mh-member-bar__me {
+  background: var(--mhb-hover);
+}
+
+.mh-member-bar__me[aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
+}
+
+.mh-member-bar__action-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .mh-member-bar__name {
   max-width: 12rem;
   overflow: hidden;
@@ -282,4 +301,17 @@ body:has(.mh-member-bar) .toast-container.position-fixed.top-0 {
   .mh-member-bar {
     display: none;
   }
+}
+
+/* Staff masquerading as a member must not miss the way back. */
+.mh-member-bar__action[href*="unmasquerade"] {
+  background: var(--mh-color-accent-gold, #ffc658);
+  color: var(--mh-color-neutral-900, #1e1f24);
+}
+
+.mh-member-bar__action[href*="unmasquerade"] .mh-member-bar__action-label {
+  position: static;
+  width: auto;
+  height: auto;
+  clip: auto;
 }

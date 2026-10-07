@@ -24,7 +24,8 @@ use Drupal\Core\Url;
  *
  * - member-nav: the primary destinations.
  * - your-dashboards: one entry per role hub, shown as a "Dashboards" menu.
- * - member-account: profile, billing, log out.
+ * - member-account: the buttons beside the viewer's name (switch back,
+ *   log out). The name itself opens My Membership.
  *
  * Every tree is access-filtered, so a link the viewer cannot reach never
  * renders. Links may also declare `options.mh_access_permission` for
@@ -91,6 +92,10 @@ class MemberBar implements TrustedCallbackInterface {
       '#dashboards' => $this->links('your-dashboards', $current),
       '#account' => $this->links('member-account', $current),
       '#display_name' => $this->currentUser->getDisplayName(),
+      // The name opens My Membership (node 5737): profile, login, billing,
+      // badges, storage. No account dropdown (JR 2026-10-06).
+      '#membership_url' => Url::fromRoute('entity.node.canonical', ['node' => 5737])->toString(),
+      '#membership_active' => $current === '/node/5737',
       '#attached' => ['library' => ['makerspace_user_links/member_bar']],
       '#cache' => $cache,
     ];

@@ -8,3 +8,6 @@ block.settings.makerspace_role_menu_cards:
     default_icon:
       type: string
       label: 'Default Bootstrap Icons name'
+    groups:
+      type: boolean
+      label: 'Show child links as titled groups'
