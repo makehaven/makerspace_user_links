@@ -53,11 +53,14 @@ function makerspace_user_links_theme(): array {
  * Implements hook_page_top().
  *
  * Puts the member bar above every page a logged-in person sees in the member
- * (Gin) and public (d11) themes. It is the navigation that replaces core's
- * sidebar for everyone except staff roles; see MemberBar.
+ * (Gin) and public (d11) themes, for everyone WITHOUT core's Navigation
+ * sidebar. Staff (`access navigation`) get the sidebar only; see MemberBar.
  */
 function makerspace_user_links_page_top(array &$page_top): void {
-  if (\Drupal::currentUser()->isAnonymous()) {
+  $account = \Drupal::currentUser();
+  // Staff keep core's Navigation sidebar instead: one menu per person, and
+  // core pins its sidebar and top bar to the very top of the window.
+  if ($account->isAnonymous() || $account->hasPermission('access navigation')) {
     return;
   }
   $theme = \Drupal::theme()->getActiveTheme()->getName();

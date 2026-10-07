@@ -16,9 +16,11 @@ use Drupal\Core\Url;
  * Builds the logged-in member bar shown at the top of every member page.
  *
  * The bar replaces core's Navigation sidebar for members, facilitators,
- * instructors, borrowers and content editors (only staff roles keep
- * `access navigation`). Everything in it comes from three menus so staff can
- * reorder or disable links without code:
+ * instructors, borrowers and content editors. Staff roles keep
+ * `access navigation` and get the sidebar INSTEAD of the bar, never both.
+ *
+ * Everything in the bar comes from three menus so staff can reorder or
+ * disable links without code:
  *
  * - member-nav: the primary destinations.
  * - your-dashboards: one entry per role hub, shown as a "Dashboards" menu.
@@ -72,7 +74,10 @@ class MemberBar implements TrustedCallbackInterface {
         'config:system.menu.your-dashboards',
       ],
     ];
-    if ($this->currentUser->isAnonymous()) {
+    // Staff keep core's Navigation sidebar and get no bar. Core pins the
+    // sidebar and its top bar (page actions such as Edit) to the top of the
+    // window, so the two cannot share it, and staff asked for fewer menus.
+    if ($this->currentUser->isAnonymous() || $this->currentUser->hasPermission('access navigation')) {
       return ['#cache' => $cache];
     }
 
