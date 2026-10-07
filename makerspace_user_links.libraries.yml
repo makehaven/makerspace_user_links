@@ -29,7 +29,7 @@ bootstrap_icons:
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css': { type: external, minified: true }
 
 member_bar:
-  version: '1.4'
+  version: '1.5'
   css:
     theme:
       css/member-bar.css: {}

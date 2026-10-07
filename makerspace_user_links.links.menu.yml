@@ -183,14 +183,19 @@ makerspace_user_links.bar.equipment:
     attributes:
       data-icon: tools
 
-makerspace_user_links.bar.help:
-  title: 'Help'
-  url: 'internal:/member-faq'
+# Second-most-clicked destination from the member hub (GA, Jul-Oct 2026):
+# members check who is on duty before coming in.
+makerspace_user_links.bar.schedule:
+  # Short label so the bar keeps its labels at 1366px; the description is the
+  # tooltip.
+  title: "Who's On"
+  description: 'Facilitator schedule: who is on duty'
+  route_name: view.facilitator_schedules.facilitator_schedule
   menu_name: member-nav
-  weight: 60
+  weight: 35
   options:
     attributes:
-      data-icon: question-circle
+      data-icon: person-check
 
 makerspace_user_links.account.profile:
   title: 'My profile'
@@ -240,6 +245,24 @@ makerspace_user_links.account.storage:
   options:
     attributes:
       data-icon: box-seam
+
+makerspace_user_links.account.borrowed:
+  title: 'Borrowed tools'
+  url: 'internal:/library/borrowed'
+  menu_name: member-account
+  weight: 45
+  options:
+    attributes:
+      data-icon: bag-check
+
+makerspace_user_links.account.help:
+  title: 'Help & FAQ'
+  url: 'internal:/member-faq'
+  menu_name: member-account
+  weight: 60
+  options:
+    attributes:
+      data-icon: question-circle
 
 makerspace_user_links.account.create:
   title: 'Create a post'

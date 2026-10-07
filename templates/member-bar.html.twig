@@ -6,7 +6,8 @@
  * Available variables:
  * - home_url: the member hub.
  * - site_url: the public front page.
- * - primary, dashboards, account: lists of { title, url, icon, active }.
+ * - primary, dashboards, account: lists of
+ *   { title, description, url, icon, active }.
  * - display_name: the viewer's name, labels the account menu.
  */
 #}
@@ -43,7 +44,7 @@
 
     <ul class="mh-member-bar__primary">
       {% for link in primary %}
-        <li><a href="{{ link.url }}" title="{{ link.title }}"{{ link.active ? ' aria-current="page"' }}>
+        <li><a href="{{ link.url }}" title="{{ link.description ?: link.title }}"{{ link.active ? ' aria-current="page"' }}>
           {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__label">{{ link.title }}</span></a></li>
       {% endfor %}
     </ul>

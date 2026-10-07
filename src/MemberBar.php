@@ -95,7 +95,7 @@ class MemberBar implements TrustedCallbackInterface {
    * Returns a menu's top-level links that the current user can reach.
    *
    * @return array
-   *   A list of links, each keyed title, url, icon and active.
+   *   A list of links, each keyed title, description, url, icon and active.
    */
   public function links(string $menu_name, string $current_path = ''): array {
     $parameters = (new MenuTreeParameters())->setMaxDepth(1)->onlyEnabledLinks();
@@ -128,6 +128,7 @@ class MemberBar implements TrustedCallbackInterface {
       }
       $links[] = [
         'title' => (string) $link->getTitle(),
+        'description' => (string) $link->getDescription(),
         'url' => $href,
         'icon' => preg_replace('/[^a-z0-9-]/', '', (string) ($options['attributes']['data-icon'] ?? '')),
         'active' => $internal !== '' && $internal === $current_path,
