@@ -40,16 +40,6 @@ makerspace_user_links.dash.facilitator:
     attributes:
       data-icon: calendar-check
 
-makerspace_user_links.dash.entrepreneur:
-  title: 'Entrepreneur Dashboard'
-  description: 'Your business profile, products, and ecosystem links.'
-  route_name: makerspace_entrepreneur_dashboard.member
-  menu_name: your-dashboards
-  weight: 25
-  options:
-    attributes:
-      data-icon: briefcase
-
 makerspace_user_links.dash.civicrm:
   title: 'CiviCRM'
   description: 'Contacts, contributions, events, and mailings.'
@@ -92,6 +82,9 @@ makerspace_user_links.dash.content:
   menu_name: your-dashboards
   weight: 35
   options:
+    # Facilitators can see the content list (a role permission), but it is not
+    # their job; editors and staff carry 'administer media'.
+    mh_access_permission: 'administer media'
     attributes:
       data-icon: file-earmark-text
 
@@ -119,66 +112,50 @@ makerspace_user_links.dash.site_admin:
       data-icon: sliders
 
 # Member bar (MemberBar): the navigation every logged-in person without
-# core's Navigation sidebar gets. Shaped by staff (2026-10-06): members start
-# from TOOLS and find badges through a tool (the /badges list hides which tool
-# a badge is for); appointments are with facilitators, so they live under
-# Facilitators with the schedule; events are public, so they stay on the
-# public site. A link with children renders as a dropdown. Give every link a
-# data-icon: on narrow screens the primary links show icons only.
-makerspace_user_links.bar.tools:
-  title: 'Tools'
-  description: 'Every tool and area, with the badge each one needs.'
-  route_name: view.equipment.page_1
+# core's Navigation sidebar gets. Grouping "B" (JR 2026-10-06): four journey
+# areas; the member's NAME opens My Membership. Grow only shows for members
+# whose goal is selling or a business (route access, GrowAccess). Give every
+# link a data-icon: on narrow screens the primary links show icons only.
+makerspace_user_links.bar.make:
+  title: 'Make'
+  description: 'Tools, rooms, materials and help in the shop.'
+  route_name: makerspace_user_links.journey_make
   menu_name: member-nav
   weight: 0
   options:
     attributes:
-      data-icon: tools
+      data-icon: hammer
 
-makerspace_user_links.bar.facilitators:
-  title: 'Facilitators'
-  description: 'Who is on duty, and your appointments with them.'
-  route_name: '<nolink>'
+makerspace_user_links.bar.learn:
+  title: 'Learn'
+  description: 'Badges, checkouts and classes.'
+  route_name: makerspace_user_links.journey_learn
   menu_name: member-nav
   weight: 10
   options:
     attributes:
-      data-icon: person-check
+      data-icon: mortarboard
 
-makerspace_user_links.bar.schedule:
-  title: "Who's on"
-  description: 'Facilitator schedule: who is on duty when.'
-  route_name: view.facilitator_schedules.facilitator_schedule
+makerspace_user_links.bar.connect:
+  title: 'Connect'
+  description: 'Volunteer, meet members, invite friends.'
+  route_name: makerspace_user_links.journey_connect
   menu_name: member-nav
-  parent: makerspace_user_links.bar.facilitators
-  weight: 0
+  weight: 20
   options:
     attributes:
-      data-icon: clock
+      data-icon: people
 
-makerspace_user_links.bar.appointments:
-  title: 'My appointments'
-  description: 'Badge checkouts and help sessions you have booked.'
-  route_name: appointment_facilitator.appointments_dashboard
-  menu_name: member-nav
-  parent: makerspace_user_links.bar.facilitators
-  weight: 10
-  options:
-    attributes:
-      data-icon: calendar-check
-
-makerspace_user_links.bar.home:
-  # Not "Home": on the public site that reads as the public homepage.
-  title: 'Member Resources'
-  description: 'Store, printing, rooms, storage, volunteering and more.'
-  route_name: entity.node.canonical
-  route_parameters:
-    node: '619'
+makerspace_user_links.bar.grow:
+  title: 'Grow'
+  description: 'Sell what you make; build a business.'
+  route_name: makerspace_user_links.journey_grow
   menu_name: member-nav
   weight: 30
   options:
+    mh_access_callback: '\Drupal\makerspace_user_links\Access\GrowAccess::visible'
     attributes:
-      data-icon: grid
+      data-icon: graph-up-arrow
 
 makerspace_user_links.account.unmasquerade:
   title: 'Switch back'
@@ -228,6 +205,23 @@ makerspace_user_links.membership.group_invite:
   route_name: '<nolink>'
   menu_name: member-membership
   weight: 30
+
+makerspace_user_links.membership.group_perks:
+  title: 'Member perks'
+  route_name: '<nolink>'
+  menu_name: member-membership
+  weight: 25
+
+makerspace_user_links.membership.perks:
+  title: 'Perks and local discounts'
+  description: 'Discounts at local businesses for MakeHaven members.'
+  route_name: makerspace_member_profile.perks_list
+  menu_name: member-membership
+  parent: makerspace_user_links.membership.group_perks
+  weight: 0
+  options:
+    attributes:
+      data-icon: tag
 
 makerspace_user_links.membership.badges:
   title: 'My badges'
@@ -366,3 +360,615 @@ makerspace_user_links.membership.referrals:
   options:
     attributes:
       data-icon: person-plus
+
+# Journey pages (JourneyController): /member/make, /learn, /connect, /grow.
+# Each menu's top-level <nolink> items are section headings; their children
+# are the cards. Grouping "B" (JR 2026-10-06): areas a member acts in, each a
+# place where their data and actions on one topic come together.
+makerspace_user_links.make.group_shop:
+  title: 'Use the shop'
+  route_name: '<nolink>'
+  menu_name: journey-make
+  weight: 0
+
+makerspace_user_links.make.tools:
+  title: 'Tools'
+  description: 'Every tool and area, with the badge each one needs.'
+  route_name: view.equipment.page_1
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_shop
+  weight: 0
+  options:
+    attributes:
+      data-icon: tools
+
+makerspace_user_links.make.whos_on:
+  title: 'Who''s on'
+  description: 'Facilitator schedule: who is on duty when.'
+  route_name: view.facilitator_schedules.facilitator_schedule
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_shop
+  weight: 10
+  options:
+    attributes:
+      data-icon: person-check
+
+makerspace_user_links.make.reservations:
+  title: 'Reserve a tool'
+  description: 'Book time on a tool you are badged for.'
+  url: 'internal:/reservations'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_shop
+  weight: 20
+  options:
+    attributes:
+      data-icon: calendar-plus
+
+makerspace_user_links.make.rooms:
+  title: 'Rooms'
+  description: 'Rooms and areas inside MakeHaven.'
+  url: 'internal:/rooms'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_shop
+  weight: 30
+  options:
+    attributes:
+      data-icon: door-open
+
+makerspace_user_links.make.group_materials:
+  title: 'Materials and services'
+  route_name: '<nolink>'
+  menu_name: journey-make
+  weight: 10
+
+makerspace_user_links.make.store:
+  title: 'Store'
+  description: 'Pay for project materials.'
+  url: 'internal:/store'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 0
+  options:
+    attributes:
+      data-icon: bag
+
+makerspace_user_links.make.printing:
+  title: 'Printing'
+  description: 'Printing services, pricing, and how to start.'
+  url: 'internal:/printing'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 10
+  options:
+    attributes:
+      data-icon: printer
+
+makerspace_user_links.make.library:
+  title: 'Lending library'
+  description: 'Borrow tools to take home.'
+  url: 'internal:/library'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 20
+  options:
+    attributes:
+      data-icon: book
+
+makerspace_user_links.make.storage:
+  title: 'Get storage'
+  description: 'Storage options and signing up.'
+  url: 'internal:/storage'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 30
+  options:
+    attributes:
+      data-icon: box-seam
+
+makerspace_user_links.make.suppliers:
+  title: 'Suppliers and community resources'
+  description: 'Places to buy things or find support.'
+  url: 'internal:/community-resources'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 40
+  options:
+    attributes:
+      data-icon: truck
+
+makerspace_user_links.make.bucket:
+  title: 'File bucket'
+  description: 'Move files to the shop computers.'
+  url: 'https://bucket.makehaven.org/'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 50
+  options:
+    attributes:
+      data-icon: bucket
+
+makerspace_user_links.make.group_projects:
+  title: 'Your projects'
+  route_name: '<nolink>'
+  menu_name: journey-make
+  weight: 20
+
+makerspace_user_links.make.start_project:
+  title: 'Start a project'
+  description: 'Say what you are making and share progress.'
+  url: 'internal:/node/add/project'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_projects
+  weight: 0
+  options:
+    attributes:
+      data-icon: lightbulb
+
+makerspace_user_links.make.projects:
+  title: 'Member projects'
+  description: 'See what other members are making.'
+  url: 'internal:/projects'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_projects
+  weight: 10
+  options:
+    attributes:
+      data-icon: collection
+
+makerspace_user_links.make.group_safety:
+  title: 'Report a problem'
+  route_name: '<nolink>'
+  menu_name: journey-make
+  weight: 30
+
+makerspace_user_links.make.accident:
+  title: 'Accident or near miss'
+  description: 'Report a safety incident quickly and confidentially.'
+  url: 'internal:/safety-concern-and-accident-report-form'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_safety
+  weight: 0
+  options:
+    attributes:
+      data-icon: exclamation-triangle
+
+makerspace_user_links.make.harassment:
+  title: 'Harassment complaint'
+  description: 'Report a harassment incident safely.'
+  url: 'https://docs.google.com/forms/d/e/1FAIpQLScd-GdCaxhcpblWjhan5TDpH_E6uF5mwCTUWHh_9pTDblz7XA/viewform'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_safety
+  weight: 10
+  options:
+    attributes:
+      data-icon: shield-exclamation
+
+makerspace_user_links.make.feedback:
+  title: 'Feedback to staff'
+  description: 'Ideas, complaints and suggestions.'
+  url: 'https://docs.google.com/forms/d/e/1FAIpQLSf4_q_t3hQruHqN_qAA00KUgBV9SgAth6gsVAOBBtiniPJFqw/viewform'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_safety
+  weight: 20
+  options:
+    attributes:
+      data-icon: chat-left-text
+
+makerspace_user_links.learn.group_badges:
+  title: 'Badges and checkouts'
+  route_name: '<nolink>'
+  menu_name: journey-learn
+  weight: 0
+
+makerspace_user_links.learn.my_badges:
+  title: 'My badges'
+  description: 'Badges you hold and ones in progress.'
+  route_name: user_current_paths.wildcardaction_redirect
+  route_parameters:
+    wildcardaction: badges
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_badges
+  weight: 0
+  options:
+    attributes:
+      data-icon: award
+
+makerspace_user_links.learn.complete:
+  title: 'Finish a badge'
+  description: 'Next steps for badges you have started.'
+  url: 'internal:/badges/complete'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_badges
+  weight: 10
+  options:
+    attributes:
+      data-icon: check2-circle
+
+makerspace_user_links.learn.appointments:
+  title: 'My appointments'
+  description: 'Checkouts and help sessions you have booked.'
+  route_name: appointment_facilitator.appointments_dashboard
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_badges
+  weight: 20
+  options:
+    attributes:
+      data-icon: calendar-check
+
+makerspace_user_links.learn.find_tool:
+  title: 'Find a tool to learn'
+  description: 'Pick a tool; its page shows the badge and how to get it.'
+  route_name: view.equipment.page_1
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_badges
+  weight: 30
+  options:
+    attributes:
+      data-icon: tools
+
+makerspace_user_links.learn.group_classes:
+  title: 'Classes'
+  route_name: '<nolink>'
+  menu_name: journey-learn
+  weight: 10
+
+makerspace_user_links.learn.classes:
+  title: 'Classes and workshops'
+  description: 'Upcoming classes, open to members and the public.'
+  url: 'internal:/events'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_classes
+  weight: 0
+  options:
+    attributes:
+      data-icon: calendar-event
+
+makerspace_user_links.learn.seats:
+  title: 'Last-minute class seats'
+  description: 'Half-price seats the day before a class.'
+  url: 'internal:/last-minute-seats'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_classes
+  weight: 10
+  options:
+    attributes:
+      data-icon: lightning-charge
+
+makerspace_user_links.learn.group_reference:
+  title: 'Reference'
+  route_name: '<nolink>'
+  menu_name: journey-learn
+  weight: 20
+
+makerspace_user_links.learn.videos:
+  title: 'Educational videos'
+  description: 'MakeHaven how-to videos.'
+  url: 'https://www.youtube.com/channel/UCLNtx8aVbTt9Ncm3vzGntNQ/playlists'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_reference
+  weight: 0
+  options:
+    attributes:
+      data-icon: play-btn
+
+makerspace_user_links.learn.faq:
+  title: 'Member FAQ'
+  description: 'Answers to common member questions.'
+  url: 'internal:/member-faq'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_reference
+  weight: 10
+  options:
+    attributes:
+      data-icon: question-circle
+
+makerspace_user_links.learn.voc:
+  title: 'Paints and VOC reference'
+  description: 'Which finishes are safe to use inside.'
+  url: 'https://docs.google.com/document/d/12BdrrRmlknDRwVhourvgmAaSLmMMHIGxUQnzyQ3vB6g/edit?usp=sharing'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_reference
+  weight: 20
+  options:
+    attributes:
+      data-icon: palette
+
+makerspace_user_links.learn.air:
+  title: 'Air quality'
+  description: 'Live air quality in the shop.'
+  url: 'base:air/monitor'
+  menu_name: journey-learn
+  parent: makerspace_user_links.learn.group_reference
+  weight: 30
+  options:
+    attributes:
+      data-icon: wind
+
+makerspace_user_links.connect.group_volunteer:
+  title: 'Volunteer'
+  route_name: '<nolink>'
+  menu_name: journey-connect
+  weight: 0
+
+makerspace_user_links.connect.board:
+  title: 'Volunteer board'
+  description: 'Open tasks and shifts you can pick up.'
+  url: 'internal:/volunteer'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 0
+  options:
+    attributes:
+      data-icon: hand-thumbs-up
+
+makerspace_user_links.connect.prefs:
+  title: 'How I like to help'
+  description: 'Tell us what you enjoy so we ask the right people.'
+  url: 'internal:/tasks/preferences'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 10
+  options:
+    attributes:
+      data-icon: sliders
+
+makerspace_user_links.connect.my_tasks:
+  title: 'My tasks'
+  description: 'Tasks you have taken on or finished.'
+  url: 'internal:/tasks/mine'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 20
+  options:
+    attributes:
+      data-icon: list-check
+
+makerspace_user_links.connect.log_fix:
+  title: 'Log something I fixed'
+  description: 'Record a fix or a job you already did.'
+  url: 'internal:/tasks/log'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 30
+  options:
+    attributes:
+      data-icon: wrench
+
+makerspace_user_links.connect.tabling:
+  title: 'Table for MakeHaven'
+  description: 'Represent MakeHaven at events.'
+  url: 'internal:/tabling'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 40
+  options:
+    attributes:
+      data-icon: megaphone
+
+makerspace_user_links.connect.facilitate:
+  title: 'Become a facilitator'
+  description: 'Volunteer to help members reach their goals.'
+  url: 'internal:/community-facilitator-program'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 50
+  options:
+    attributes:
+      data-icon: person-check
+
+makerspace_user_links.connect.leadership:
+  title: 'Volunteer leadership'
+  description: 'Board and committees.'
+  url: 'internal:/volunteer-leadership-structure'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_volunteer
+  weight: 60
+  options:
+    attributes:
+      data-icon: diagram-3
+
+makerspace_user_links.connect.group_community:
+  title: 'Community'
+  route_name: '<nolink>'
+  menu_name: journey-connect
+  weight: 10
+
+makerspace_user_links.connect.members:
+  title: 'Member list'
+  description: 'Members with photos.'
+  url: 'base:member-contacts'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_community
+  weight: 0
+  options:
+    attributes:
+      data-icon: people
+
+makerspace_user_links.connect.slack:
+  title: 'Slack'
+  description: 'Chat with the MakeHaven community.'
+  url: 'https://makehaven.slack.com/'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_community
+  weight: 10
+  options:
+    attributes:
+      data-icon: slack
+
+makerspace_user_links.connect.meetup:
+  title: 'Propose a meetup'
+  description: 'Organise a meetup around an interest.'
+  url: 'internal:/form/webform-25318'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_community
+  weight: 20
+  options:
+    attributes:
+      data-icon: calendar-plus
+
+makerspace_user_links.connect.wishes:
+  title: 'Wish list'
+  description: 'Wishes for equipment or policy.'
+  url: 'internal:/wishes'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_community
+  weight: 30
+  options:
+    attributes:
+      data-icon: lightbulb
+
+makerspace_user_links.connect.blog:
+  title: 'Write a blog post'
+  description: 'Share an experience connected to MakeHaven.'
+  url: 'internal:/node/add/blog'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_community
+  weight: 40
+  options:
+    attributes:
+      data-icon: pencil
+
+makerspace_user_links.connect.teach:
+  title: 'Teach at MakeHaven'
+  description: 'Propose and teach a workshop.'
+  route_name: instructor_companion.become_instructor
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_community
+  weight: 50
+  options:
+    attributes:
+      data-icon: mortarboard
+
+makerspace_user_links.connect.group_invite:
+  title: 'Invite someone'
+  route_name: '<nolink>'
+  menu_name: journey-connect
+  weight: 20
+
+makerspace_user_links.connect.refer:
+  title: 'Refer a friend'
+  description: 'Earn credit when someone you invite joins.'
+  route_name: makerspace_referrals.my
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_invite
+  weight: 0
+  options:
+    attributes:
+      data-icon: person-plus
+
+makerspace_user_links.connect.household:
+  title: 'Add a household member'
+  description: 'Someone at your address joins on your membership.'
+  url: 'internal:/node/24988'
+  menu_name: journey-connect
+  parent: makerspace_user_links.connect.group_invite
+  weight: 10
+  options:
+    attributes:
+      data-icon: people
+
+makerspace_user_links.grow.group_business:
+  title: 'Your business'
+  route_name: '<nolink>'
+  menu_name: journey-grow
+  weight: 0
+
+makerspace_user_links.grow.dashboard:
+  title: 'Business dashboard'
+  description: 'Your business profile, products and coaching.'
+  route_name: makerspace_entrepreneur_dashboard.member
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_business
+  weight: 0
+  options:
+    attributes:
+      data-icon: briefcase
+
+makerspace_user_links.grow.list:
+  title: 'List your business'
+  description: 'Be found in the member business directory.'
+  url: 'internal:/list-your-business'
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_business
+  weight: 10
+  options:
+    attributes:
+      data-icon: shop
+
+makerspace_user_links.grow.group_sell:
+  title: 'Sell and be seen'
+  route_name: '<nolink>'
+  menu_name: journey-grow
+  weight: 10
+
+makerspace_user_links.grow.shop_local:
+  title: 'Shop local makers'
+  description: 'Products made by MakeHaven members.'
+  url: 'internal:/business/products'
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_sell
+  weight: 0
+  options:
+    attributes:
+      data-icon: basket
+
+makerspace_user_links.grow.directory:
+  title: 'Member businesses'
+  description: 'Businesses started or run by members.'
+  url: 'internal:/businesses'
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_sell
+  weight: 10
+  options:
+    attributes:
+      data-icon: buildings
+
+makerspace_user_links.grow.showcase:
+  title: 'Maker showcase'
+  description: 'Show your work to the public.'
+  url: 'internal:/maker-showcase'
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_sell
+  weight: 20
+  options:
+    attributes:
+      data-icon: easel
+
+makerspace_user_links.grow.group_space:
+  title: 'Space for your work'
+  route_name: '<nolink>'
+  menu_name: journey-grow
+  weight: 20
+
+makerspace_user_links.grow.workspace:
+  title: 'Get workspace'
+  description: 'Rent a desk or room monthly.'
+  url: 'internal:/workspace'
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_space
+  weight: 0
+  options:
+    attributes:
+      data-icon: building
+
+makerspace_user_links.grow.event_space:
+  title: 'Event space'
+  description: 'Rent a room for an event or private class.'
+  url: 'internal:/room-rentals'
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_space
+  weight: 10
+  options:
+    attributes:
+      data-icon: easel2
+
+makerspace_user_links.grow.teach_paid:
+  title: 'Teach paid workshops'
+  description: 'Earn by teaching what you know.'
+  route_name: instructor_companion.become_instructor
+  menu_name: journey-grow
+  parent: makerspace_user_links.grow.group_space
+  weight: 20
+  options:
+    attributes:
+      data-icon: mortarboard

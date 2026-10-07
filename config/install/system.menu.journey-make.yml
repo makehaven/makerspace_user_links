@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - makerspace_user_links
+id: journey-make
+label: 'Journey: Make'
+description: 'Cards on the /member/make journey page.'
+locked: true

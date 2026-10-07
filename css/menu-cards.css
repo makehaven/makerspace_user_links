@@ -25,6 +25,26 @@
   gap: 1rem;
 }
 
+/* Phones: two compact cards a row instead of one tall card per row. */
+@media (max-width: 480px) {
+  .mh-menu-cards__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .mh-menu-cards__card {
+    padding: 0.9rem 0.6rem;
+  }
+
+  .mh-menu-cards__desc {
+    font-size: 0.8rem;
+  }
+
+  .mh-menu-cards__icon {
+    font-size: 2rem;
+  }
+}
+
 .mh-menu-cards__card {
   display: flex;
   flex-direction: column;

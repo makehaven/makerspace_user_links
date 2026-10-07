@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - makerspace_user_links
+id: journey-connect
+label: 'Journey: Connect'
+description: 'Cards on the /member/connect journey page.'
+locked: true

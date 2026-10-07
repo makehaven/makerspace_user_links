@@ -5,7 +5,7 @@ user_links:
 
 menu_cards:
   # Bump on every CSS change: the aggregate filename ignores file contents.
-  version: '1.1'
+  version: '1.3'
   css:
     theme:
       css/menu-cards.css: {}
@@ -31,7 +31,7 @@ bootstrap_icons:
       'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css': { type: external, minified: true }
 
 member_bar:
-  version: '1.7'
+  version: '1.9'
   css:
     theme:
       css/member-bar.css: {}

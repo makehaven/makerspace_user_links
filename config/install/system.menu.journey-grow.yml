@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - makerspace_user_links
+id: journey-grow
+label: 'Journey: Grow'
+description: 'Cards on the /member/grow journey page.'
+locked: true

@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - makerspace_user_links
+id: journey-learn
+label: 'Journey: Learn'
+description: 'Cards on the /member/learn journey page.'
+locked: true

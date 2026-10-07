@@ -1,0 +1,41 @@
+# Member journey pages (JR 2026-10-06, "grouping B"): the member bar's four
+# areas. Each page renders its journey-* menu as grouped cards; see
+# JourneyController. Served in the member theme by the theme_switcher rule
+# member_only_theme.
+makerspace_user_links.journey_make:
+  path: '/member/make'
+  defaults:
+    _controller: '\Drupal\makerspace_user_links\Controller\JourneyController::page'
+    _title: 'Make'
+    journey: make
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+makerspace_user_links.journey_learn:
+  path: '/member/learn'
+  defaults:
+    _controller: '\Drupal\makerspace_user_links\Controller\JourneyController::page'
+    _title: 'Learn'
+    journey: learn
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+makerspace_user_links.journey_connect:
+  path: '/member/connect'
+  defaults:
+    _controller: '\Drupal\makerspace_user_links\Controller\JourneyController::page'
+    _title: 'Connect'
+    journey: connect
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+# Open to every member; only the bar LINK is limited to members whose
+# join-form goal is selling or a business (GrowAccess::visible).
+makerspace_user_links.journey_grow:
+  path: '/member/grow'
+  defaults:
+    _controller: '\Drupal\makerspace_user_links\Controller\JourneyController::page'
+    _title: 'Grow'
+    journey: grow
+  requirements:
+    _user_is_logged_in: 'TRUE'

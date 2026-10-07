@@ -285,9 +285,15 @@
   }
 }
 
-@container mhbar (max-width: 380px) {
+/* Small phones: the gold MEMBERS tag alone carries the brand, so Menu,
+   Website, the name and Log out still fit on a 390px screen. */
+@container mhbar (max-width: 440px) {
   .mh-member-bar__brand-name {
     display: none;
+  }
+
+  .mh-member-bar__inner {
+    padding: 0 0.5rem;
   }
 }
 
@@ -314,4 +320,11 @@ body:has(.mh-member-bar) .toast-container.position-fixed.top-0 {
   width: auto;
   height: auto;
   clip: auto;
+}
+
+/* Recent Chrome lays out the contents of a CLOSED <details>, so a closed
+   panel still widened the page on phones (a 390px screen scrolled to 425px).
+   Closed menus take no space at all. */
+.mh-member-bar details:not([open]) > .mh-member-bar__panel {
+  display: none;
 }

@@ -137,6 +137,12 @@ class MemberBar implements TrustedCallbackInterface {
       if ($permission && !$this->currentUser->hasPermission($permission)) {
         continue;
       }
+      // A link may name a static visibility check, e.g. Grow is offered only
+      // to members whose goal is selling or a business.
+      $callback = $options['mh_access_callback'] ?? NULL;
+      if ($callback && is_callable($callback) && !$callback($this->currentUser)) {
+        continue;
+      }
       $url = $link->getUrlObject();
       $nolink = $url->isRouted() && $url->getRouteName() === '<nolink>';
       try {
