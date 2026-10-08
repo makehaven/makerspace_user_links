@@ -73,12 +73,12 @@
               <ul class="mh-member-bar__panel mh-member-bar__panel--start mh-member-bar__list">
                 {% if link.url %}
                   <li class="mh-member-bar__panel-head"><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                    <span class="mh-member-bar__item-text">{{ 'All of @area'|t({'@area': link.title}) }}{% if link.description %}<small>{{ link.description }}</small>{% endif %}</span></a></li>
+                    <span class="mh-member-bar__item-text">{{ 'All of @area'|t({'@area': link.title}) }}</span></a></li>
                 {% endif %}
                 {% for child in link.children %}
                   <li><a href="{{ child.url }}"{{ child.active ? ' aria-current="page"' }}>
                     {% if child.icon %}<span class="bi bi-{{ child.icon }}" aria-hidden="true"></span>{% endif %}
-                    <span class="mh-member-bar__item-text">{{ child.title }}{% if child.description %}<small>{{ child.description }}</small>{% endif %}</span></a></li>
+                    <span class="mh-member-bar__item-text">{{ child.title }}</span></a></li>
                 {% endfor %}
               </ul>
             </details>
