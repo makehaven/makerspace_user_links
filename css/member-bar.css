@@ -1,14 +1,18 @@
 /**
  * @file
- * The logged-in member bar. Renders in both the Gin member theme and the d11
- * public theme, so every colour carries a fallback: Gin does not load the d11
- * token file.
+ * The logged-in member bar. Renders in the Gin member theme, which does not
+ * load the d11 token file, so every token carries its d11 value as fallback.
+ *
+ * Layout: Member Resources (gold) at the start, the MakeHaven wordmark
+ * centred, dashboards / search / Public Website / name / log out at the end.
  */
 
 .mh-member-bar {
   --mhb-bg: var(--mh-color-brand-primary-strong, #710a0a);
   --mhb-fg: #fff;
   --mhb-hover: rgba(255, 255, 255, 0.14);
+  --mhb-gold: var(--mh-color-accent-gold, #ffc658);
+  --mhb-ink: var(--mh-color-neutral-900, #1e1f24);
   --mhb-panel-bg: var(--mh-color-surface, #fff);
   --mhb-panel-fg: var(--mh-color-neutral-900, #1e1f24);
   --mhb-panel-hover: var(--mh-color-neutral-100, #f2f2f2);
@@ -32,24 +36,36 @@
   box-sizing: border-box;
 }
 
+/* Start and end sit at the edges; the wordmark is centred on the bar
+   itself. member-bar.js sheds width (and finally the wordmark) whenever the
+   two would touch. */
 .mh-member-bar__inner {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: space-between;
+  gap: 0.5rem;
   min-height: 3rem;
   padding: 0 1rem;
 }
 
+.mh-member-bar__start,
+.mh-member-bar__end {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
 .mh-member-bar a,
 .mh-member-bar summary {
-  /* Both themes style links; the bar keeps its own type. */
+  /* Gin styles links; the bar keeps its own type. */
   font: inherit;
   letter-spacing: normal;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 0.65rem;
-  border-radius: 0.375rem;
+  border-radius: var(--mh-radius-md, 0.5rem);
   color: inherit;
   text-decoration: none;
   white-space: nowrap;
@@ -68,7 +84,7 @@
 
 .mh-member-bar a:focus-visible,
 .mh-member-bar summary:focus-visible {
-  outline: 2px solid var(--mh-color-accent-gold, #ffc658);
+  outline: 2px solid var(--mhb-gold);
   outline-offset: 1px;
 }
 
@@ -86,60 +102,67 @@
   list-style: none;
 }
 
-/* Brand: the "you are inside" signature. */
-.mh-member-bar__brand {
-  margin-right: 0.5rem;
+/* Member Resources: the gold "you are inside" button. */
+.mh-member-bar .mh-member-bar__home {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--mh-radius-pill, 999px);
+  background: var(--mhb-gold);
+  color: var(--mhb-ink);
   font-weight: 700;
 }
 
-.mh-member-bar__brand-tag {
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  background: var(--mh-color-accent-gold, #ffc658);
-  color: var(--mh-color-neutral-900, #1e1f24);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+.mh-member-bar .mh-member-bar__home:hover,
+.mh-member-bar .mh-member-bar__home:focus-visible {
+  background: #fff;
+  color: var(--mhb-ink);
+}
+
+.mh-member-bar .mh-member-bar__home[aria-current="page"] {
+  box-shadow: 0 0 0 2px #fff;
 }
 
 .mh-member-bar__primary {
   display: flex;
-  flex-wrap: nowrap;
   align-items: center;
   gap: 0.125rem;
-  min-width: 0;
-  /* Last resort: clip rather than run under the end group. member-bar.js
-     switches to icons before this is ever visible. */
-  overflow: hidden;
+  margin-left: 0.25rem;
 }
 
-/* Slightly tighter than the end group: seven links share the row. */
-.mh-member-bar__primary a {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+.mh-member-bar__primary a[aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--mhb-gold);
+  border-radius: var(--mh-radius-md, 0.5rem) var(--mh-radius-md, 0.5rem) 0 0;
 }
 
-/* Dropdowns that open from the primary row (Facilitators). The primary row
-   clips overflow, so these panels open in the bar's coordinates instead. */
-.mh-member-bar__primary {
-  overflow: visible;
+/* The wordmark: a reminder of whose site this is, not a link. Its red
+   letters vanish on the red bar, so it sits on a white plate as it does in
+   the public header. */
+.mh-member-bar__logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--mh-radius-md, 0.5rem);
+  background: var(--mh-color-surface, #fff);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
-.mh-member-bar__panel--start {
-  left: 0;
-  right: auto;
-  min-width: 17rem;
+.mh-member-bar__logo img {
+  display: block;
+  width: auto;
+  height: 22px;
 }
 
-/* Search: an input at desktop widths, an icon link on phones. */
+/* Search: an input at desktop widths, an icon link when space runs out. */
 .mh-member-bar__search {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   margin: 0 0.25rem;
   padding: 0 0.6rem;
-  border-radius: 999px;
+  border-radius: var(--mh-radius-pill, 999px);
   background: var(--mhb-hover);
 }
 
@@ -175,12 +198,6 @@
   display: none;
 }
 
-.mh-member-bar__panel-head {
-  margin-bottom: 0.25rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid var(--mhb-border);
-}
-
 .mh-member-bar__caret {
   font-size: 0.7rem;
   opacity: 0.8;
@@ -199,27 +216,6 @@
   font-weight: 400;
 }
 
-.mh-member-bar__primary summary[data-active] {
-  box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
-  border-radius: 0.375rem 0.375rem 0 0;
-}
-
-.mh-member-bar__list-group > .mh-member-bar__list {
-  padding-left: 0.5rem;
-}
-
-.mh-member-bar__primary a[aria-current="page"] {
-  box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
-  border-radius: 0.375rem 0.375rem 0 0;
-}
-
-.mh-member-bar__end {
-  display: flex;
-  align-items: center;
-  gap: 0.125rem;
-  margin-left: auto;
-}
-
 /* Name → My Membership; the actions beside it (log out, switch back) show
    an icon only, with the label kept for screen readers and the tooltip. */
 .mh-member-bar__me {
@@ -227,7 +223,7 @@
 }
 
 .mh-member-bar__me[aria-current="page"] {
-  box-shadow: inset 0 -3px 0 var(--mh-color-accent-gold, #ffc658);
+  box-shadow: inset 0 -3px 0 var(--mhb-gold);
 }
 
 .mh-member-bar__action-label {
@@ -245,7 +241,7 @@
   text-overflow: ellipsis;
 }
 
-/* Dropdowns. */
+/* Dashboards dropdown. */
 .mh-member-bar__drop {
   position: relative;
 }
@@ -254,17 +250,19 @@
   position: absolute;
   top: calc(100% + 0.35rem);
   right: 0;
-  min-width: 14rem;
+  min-width: 17rem;
+  max-width: calc(100vw - 1rem);
   padding: 0.35rem;
   border: 1px solid var(--mhb-border);
-  border-radius: 0.5rem;
+  border-radius: var(--mh-radius-md, 0.5rem);
   background: var(--mhb-panel-bg);
   color: var(--mhb-panel-fg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--mh-shadow-md, 0 6px 20px rgb(19 19 20 / 0.12));
 }
 
 .mh-member-bar__panel a {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   color: var(--mhb-panel-fg);
 }
@@ -278,25 +276,14 @@
 
 .mh-member-bar__panel .bi {
   width: 1.1rem;
+  margin-top: 0.1rem;
   color: var(--mh-color-brand-primary, #8b1919);
 }
 
-.mh-member-bar__group {
-  margin: 0.5rem 0.65rem 0.25rem;
-  color: var(--mh-color-neutral-600, #616161);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-/* The mobile menu button is hidden until the primary links stop fitting. */
-.mh-member-bar__menu-toggle {
-  display: none;
-}
-
-/* When the labels do not fit (member-bar.js measures), links shrink to
-   icons in two steps; the labels stay for screen readers, and the title
-   attribute shows them on hover. The search input gives way first. */
+/* When the end group would run into the wordmark (member-bar.js measures),
+   shed width in steps: the search input becomes an icon, then the labels go
+   (kept for screen readers; the title attribute shows them on hover), then
+   the wordmark. */
 .mh-member-bar.is-tight .mh-member-bar__search {
   display: none;
 }
@@ -305,8 +292,7 @@
   display: inline-flex;
 }
 
-.mh-member-bar.is-tight .mh-member-bar__end .mh-member-bar__label,
-.mh-member-bar.is-compact .mh-member-bar__primary .mh-member-bar__label {
+.mh-member-bar.is-compact .mh-member-bar__label {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -315,12 +301,17 @@
   white-space: nowrap;
 }
 
+.mh-member-bar.is-crowded .mh-member-bar__logo {
+  display: none;
+}
+
 @container mhbar (max-width: 760px) {
+  .mh-member-bar__logo,
   .mh-member-bar__primary,
-  .mh-member-bar__dashboards,
   .mh-member-bar__name,
   .mh-member-bar__search,
-  .mh-member-bar__site .mh-member-bar__label {
+  .mh-member-bar__caret,
+  .mh-member-bar .mh-member-bar__label {
     display: none;
   }
 
@@ -328,17 +319,13 @@
     display: inline-flex;
   }
 
-  .mh-member-bar__menu-toggle {
-    display: block;
-  }
-
-  /* The phone menu spans the bar instead of hanging off its button. */
+  /* The dashboards panel spans the bar instead of hanging off its button. */
   .mh-member-bar__inner,
-  .mh-member-bar__menu-toggle {
+  .mh-member-bar__dashboards {
     position: static;
   }
 
-  .mh-member-bar__panel--wide {
+  .mh-member-bar__panel {
     left: 0.5rem;
     right: 0.5rem;
     top: calc(100% + 0.25rem);
@@ -347,22 +334,20 @@
   }
 }
 
-/* Small phones: the gold MEMBERS tag alone carries the brand, so Menu,
-   Website, the name and Log out still fit on a 390px screen. */
+/* Small phones: the button keeps its gold and its words; the end group
+   tightens so Dashboards, search, Public Website, the name and Log out
+   still fit on a 390px screen. */
 @container mhbar (max-width: 440px) {
-  .mh-member-bar__brand-name {
-    display: none;
-  }
-
   .mh-member-bar__inner {
+    gap: 0.25rem;
     padding: 0 0.5rem;
   }
-}
 
-/* d11 shows status messages as toasts pinned to the top-right corner
-   (Bootstrap's `top-0` is !important); keep them clear of the account menu. */
-body:has(.mh-member-bar) .toast-container.position-fixed.top-0 {
-  top: 3.25rem !important;
+  .mh-member-bar__end a,
+  .mh-member-bar__end summary {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }
 
 @media print {
@@ -373,8 +358,8 @@ body:has(.mh-member-bar) .toast-container.position-fixed.top-0 {
 
 /* Staff masquerading as a member must not miss the way back. */
 .mh-member-bar__action[href*="unmasquerade"] {
-  background: var(--mh-color-accent-gold, #ffc658);
-  color: var(--mh-color-neutral-900, #1e1f24);
+  background: var(--mhb-gold);
+  color: var(--mhb-ink);
 }
 
 .mh-member-bar__action[href*="unmasquerade"] .mh-member-bar__action-label {

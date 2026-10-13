@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\makerspace_user_links;
 
+use Drupal\Core\Extension\ThemeExtensionList;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Path\CurrentPathStack;
@@ -19,17 +21,26 @@ use Drupal\Core\Url;
  * instructors, borrowers and content editors. Staff roles keep
  * `access navigation` and get the sidebar INSTEAD of the bar, never both.
  *
- * Everything in the bar comes from three menus so staff can reorder or
- * disable links without code:
+ * The bar renders in the member (Gin) theme only. The public site already has
+ * its own header, navigation and search, so there a logged-in member gets just
+ * a gold "Member Resources" button in the header's red top strip
+ * (buildPublicReturn()) instead of a second bar and a second search box
+ * (JR 2026-10-13).
  *
- * - member-nav: the primary destinations.
+ * Its links come from three menus so staff can reorder or disable them
+ * without code:
+ *
+ * - member-nav: optional extra links beside Member Resources (empty since the
+ *   Make / Learn / Connect / Grow dropdowns left the bar; the Member
+ *   Resources page lists those journeys in full).
  * - your-dashboards: one entry per role hub, shown as a "Dashboards" menu.
  * - member-account: the buttons beside the viewer's name (switch back,
  *   log out). The name itself opens My Membership.
  *
  * Every tree is access-filtered, so a link the viewer cannot reach never
  * renders. Links may also declare `options.mh_access_permission` for
- * destinations that gate access internally (CiviCRM).
+ * destinations that gate access internally (CiviCRM), or
+ * `options.mh_access_callback` for a static visibility check.
  */
 class MemberBar implements TrustedCallbackInterface {
 
@@ -38,19 +49,31 @@ class MemberBar implements TrustedCallbackInterface {
   /**
    * Themes the bar renders in. The kiosk theme and Claro are excluded.
    */
-  public const THEMES = ['makerspace_gin', 'barrio_boostrap_5_makehaven_d11'];
+  public const THEMES = ['makerspace_gin'];
+
+  /**
+   * The public theme, where members get only the Member Resources button.
+   */
+  public const PUBLIC_THEME = 'barrio_boostrap_5_makehaven_d11';
+
+  /**
+   * The Member Resources page (the member hub).
+   */
+  public const HUB_NID = 619;
 
   public function __construct(
     protected MenuLinkTreeInterface $menuTree,
     protected AccountInterface $currentUser,
     protected CurrentPathStack $currentPath,
+    protected ThemeExtensionList $themeList,
+    protected FileUrlGeneratorInterface $fileUrlGenerator,
   ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function trustedCallbacks(): array {
-    return ['build'];
+    return ['build', 'buildPublicReturn'];
   }
 
   /**
@@ -64,11 +87,49 @@ class MemberBar implements TrustedCallbackInterface {
   }
 
   /**
+   * Returns a placeholder for the public header's Member Resources button.
+   */
+  public function publicReturnPlaceholder(): array {
+    return [
+      '#lazy_builder' => ['makerspace_user_links.member_bar:buildPublicReturn', []],
+      '#create_placeholder' => TRUE,
+      '#weight' => -100,
+    ];
+  }
+
+  /**
+   * Lazy builder: the public theme's way back to the member side.
+   *
+   * One gold button, plus "Switch back" while staff masquerade (the bar that
+   * used to carry it no longer renders on public pages).
+   */
+  public function buildPublicReturn(): array {
+    $cache = [
+      'contexts' => ['user.permissions', 'session.is_masquerading'],
+      'tags' => ['config:system.menu.member-account'],
+    ];
+    if ($this->currentUser->isAnonymous() || $this->currentUser->hasPermission('access navigation')) {
+      return ['#cache' => $cache];
+    }
+    $switch_back = array_values(array_filter(
+      $this->links('member-account'),
+      static fn(array $link): bool => str_contains($link['url'], 'unmasquerade'),
+    ));
+    return [
+      '#theme' => 'makerspace_user_links_member_return',
+      '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => self::HUB_NID])->toString(),
+      '#account' => $switch_back,
+      '#attached' => ['library' => ['makerspace_user_links/member_return']],
+      '#cache' => $cache,
+    ];
+  }
+
+  /**
    * Lazy builder: renders the bar for the current user.
    */
   public function build(): array {
     $cache = [
-      'contexts' => ['user', 'url.path'],
+      'contexts' => ['user', 'url.path', 'session.is_masquerading'],
       'tags' => [
         'config:system.menu.member-nav',
         'config:system.menu.member-account',
@@ -84,16 +145,20 @@ class MemberBar implements TrustedCallbackInterface {
 
     $current = $this->currentPath->getPath();
 
+    $hub_url = Url::fromRoute('entity.node.canonical', ['node' => self::HUB_NID])->toString();
+
     return [
       '#theme' => 'makerspace_user_links_member_bar',
-      '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => 619])->toString(),
+      '#home_url' => $hub_url,
+      '#home_active' => $current === '/node/' . self::HUB_NID,
       '#site_url' => Url::fromRoute('<front>')->toString(),
+      '#logo_url' => $this->logoUrl(),
       // The bar's search box submits to the Member Resources index, whose
       // type-to-filter box (makerspace_member_navigator) reads ?q.
-      '#search_url' => Url::fromRoute('entity.node.canonical', ['node' => 619])->toString(),
-      '#primary' => $this->links('member-nav', $current),
-      '#dashboards' => $this->links('your-dashboards', $current),
-      '#account' => $this->links('member-account', $current),
+      '#search_url' => $hub_url,
+      '#primary' => $this->links('member-nav', $current, FALSE),
+      '#dashboards' => $this->links('your-dashboards', $current, FALSE),
+      '#account' => $this->links('member-account', $current, FALSE),
       '#display_name' => $this->currentUser->getDisplayName(),
       // The name opens My Membership (node 5737): profile, login, billing,
       // badges, storage. No account dropdown (JR 2026-10-06).
@@ -105,25 +170,40 @@ class MemberBar implements TrustedCallbackInterface {
   }
 
   /**
-   * Returns a menu's links that the current user can reach, two levels deep.
+   * Returns the URL of the public theme's MakeHaven wordmark.
    *
-   * A top-level link with children renders as a dropdown in the bar. A
-   * parent that points nowhere (`<nolink>`) and has no reachable children is
-   * dropped. A parent that points somewhere keeps that as the dropdown's
-   * first entry ("All of Make").
+   * The bar shows it centred as a reminder of whose site this is. It is the
+   * file the public header uses (theme logo setting), falling back to the
+   * copy shipped with the public theme.
+   */
+  protected function logoUrl(): string {
+    $logo = theme_get_setting('logo.url', self::PUBLIC_THEME);
+    if (is_string($logo) && $logo !== '') {
+      return $logo;
+    }
+    $path = $this->themeList->getPath(self::PUBLIC_THEME) . '/logo.png';
+    return $this->fileUrlGenerator->generateString($path);
+  }
+
+  /**
+   * Returns a menu's links that the current user can reach.
+   *
+   * With $recurse, two levels deep: a parent that points nowhere
+   * (`<nolink>`) and has no reachable children is dropped. The bar itself
+   * renders top-level links only (no dropdowns besides Dashboards).
    *
    * @return array
    *   A list of links, each keyed title, description, url (empty for
    *   <nolink>), icon, active and children (the same shape, one level).
    */
-  public function links(string $menu_name, string $current_path = ''): array {
-    $parameters = (new MenuTreeParameters())->setMaxDepth(2)->onlyEnabledLinks();
+  public function links(string $menu_name, string $current_path = '', bool $recurse = TRUE): array {
+    $parameters = (new MenuTreeParameters())->setMaxDepth($recurse ? 2 : 1)->onlyEnabledLinks();
     $tree = $this->menuTree->load($menu_name, $parameters);
     $tree = $this->menuTree->transform($tree, [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ]);
-    return $this->buildLinks($tree, $current_path, TRUE);
+    return $this->buildLinks($tree, $current_path, $recurse);
   }
 
   /**
@@ -141,8 +221,9 @@ class MemberBar implements TrustedCallbackInterface {
       if ($permission && !$this->currentUser->hasPermission($permission)) {
         continue;
       }
-      // A link may name a static visibility check, e.g. Grow is offered only
-      // to members whose goal is selling or a business.
+      // A link may name a static visibility check, e.g. the Business
+      // dashboard is offered only to members whose goal is selling or a
+      // business (GrowAccess).
       $callback = $options['mh_access_callback'] ?? NULL;
       if ($callback && is_callable($callback) && !$callback($this->currentUser)) {
         continue;
@@ -159,13 +240,6 @@ class MemberBar implements TrustedCallbackInterface {
         continue;
       }
       $children = ($recurse && $element->subtree) ? $this->buildLinks($element->subtree, $current_path, FALSE) : [];
-      // A journey link lists its most-used destinations as a dropdown, so
-      // Tools, My badges or Who's on are one click from any page without
-      // opening the journey page first. The journey menu marks them with
-      // `mh_quick: true`; the bar link names the menu in `mh_quick_menu`.
-      if ($recurse && !$children && !empty($options['mh_quick_menu'])) {
-        $children = $this->quickLinks((string) $options['mh_quick_menu'], $current_path);
-      }
       if ($nolink && !$children) {
         continue;
       }
@@ -183,27 +257,6 @@ class MemberBar implements TrustedCallbackInterface {
       ];
     }
     return $links;
-  }
-
-  /**
-   * Returns the links a journey menu flags with `mh_quick: true`, in order.
-   */
-  protected function quickLinks(string $menu_name, string $current_path): array {
-    $parameters = (new MenuTreeParameters())->setMaxDepth(2)->onlyEnabledLinks();
-    $tree = $this->menuTree->load($menu_name, $parameters);
-    $tree = $this->menuTree->transform($tree, [
-      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
-      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
-    ]);
-    $quick = [];
-    foreach ($tree as $element) {
-      foreach ($element->subtree ?: [$element] as $leaf) {
-        if (!empty($leaf->link->getOptions()['mh_quick'])) {
-          $quick = array_merge($quick, $this->buildLinks([$leaf], $current_path, FALSE));
-        }
-      }
-    }
-    return $quick;
   }
 
 }

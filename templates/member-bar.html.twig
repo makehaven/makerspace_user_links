@@ -1,15 +1,17 @@
 {#
 /**
  * @file
- * The logged-in member bar (see MemberBar).
+ * The logged-in member bar (see MemberBar). Member (Gin) theme only.
  *
  * Available variables:
- * - home_url: the member hub.
- * - site_url: the public front page.
+ * - home_url, home_active: Member Resources (node 619), the gold button.
+ * - site_url: the public front page ("Public Website").
+ * - logo_url: the MakeHaven wordmark, shown centred and not linked.
  * - search_url: where the search box submits (Member Resources, ?q=).
  * - primary, dashboards, account: lists of
- *   { title, description, url, icon, active, children }. A primary link with
- *   children renders as a dropdown (a labelled group in the phone menu).
+ *   { title, description, url, icon, active }. Primary links (member-nav,
+ *   usually empty) sit beside Member Resources; dashboards are the viewer's
+ *   role dashboards, already access-filtered.
  * - display_name: the viewer's name; links to My Membership.
  * - membership_url, membership_active: My Membership (node 5737).
  * - account: action buttons beside the name (switch back, log out).
@@ -17,87 +19,35 @@
 #}
 <nav class="mh-member-bar" aria-label="{{ 'Member'|t }}">
   <div class="mh-member-bar__inner">
-    <a class="mh-member-bar__brand" href="{{ home_url }}">
-      <span class="mh-member-bar__brand-name">MakeHaven</span>
-      <span class="mh-member-bar__brand-tag">{{ 'Members'|t }}</span>
-    </a>
-
-    <details class="mh-member-bar__menu-toggle mh-member-bar__drop">
-      <summary aria-label="{{ 'Menu'|t }}">
-        <span class="bi bi-list" aria-hidden="true"></span>
-        <span class="mh-member-bar__toggle-label">{{ 'Menu'|t }}</span>
-      </summary>
-      <div class="mh-member-bar__panel mh-member-bar__panel--wide">
-        <ul class="mh-member-bar__list">
+    <div class="mh-member-bar__start">
+      <a class="mh-member-bar__home" href="{{ home_url }}"{{ home_active ? ' aria-current="page"' }}>
+        <span class="bi bi-grid-3x3-gap-fill" aria-hidden="true"></span><span class="mh-member-bar__home-label">{{ 'Member Resources'|t }}</span>
+      </a>
+      {% if primary %}
+        <ul class="mh-member-bar__primary">
           {% for link in primary %}
-            {% if link.children %}
-              <li class="mh-member-bar__list-group">
-                <p class="mh-member-bar__group">{{ link.title }}</p>
-                <ul class="mh-member-bar__list">
-                  {% if link.url %}
-                    <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                      {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ 'All of @area'|t({'@area': link.title}) }}</a></li>
-                  {% endif %}
-                  {% for child in link.children %}
-                    <li><a href="{{ child.url }}"{{ child.active ? ' aria-current="page"' }}>
-                      {% if child.icon %}<span class="bi bi-{{ child.icon }}" aria-hidden="true"></span>{% endif %}{{ child.title }}</a></li>
-                  {% endfor %}
-                </ul>
-              </li>
-            {% else %}
-              <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
-            {% endif %}
+            <li><a href="{{ link.url }}" title="{{ link.description ?: link.title }}"{{ link.active ? ' aria-current="page"' }}>
+              {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__label">{{ link.title }}</span></a></li>
           {% endfor %}
         </ul>
-        {% if dashboards %}
-          <p class="mh-member-bar__group">{{ 'Dashboards'|t }}</p>
-          <ul class="mh-member-bar__list">
-            {% for link in dashboards %}
-              <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
-    </details>
+      {% endif %}
+    </div>
 
-    <ul class="mh-member-bar__primary">
-      {% for link in primary %}
-        {% if link.children %}
-          <li>
-            <details class="mh-member-bar__drop mh-member-bar__sub">
-              <summary title="{{ link.description ?: link.title }}"{{ link.active ? ' data-active' }}>
-                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__label">{{ link.title }}</span><span class="bi bi-chevron-down mh-member-bar__caret" aria-hidden="true"></span>
-              </summary>
-              <ul class="mh-member-bar__panel mh-member-bar__panel--start mh-member-bar__list">
-                {% if link.url %}
-                  <li class="mh-member-bar__panel-head"><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                    <span class="mh-member-bar__item-text">{{ 'All of @area'|t({'@area': link.title}) }}</span></a></li>
-                {% endif %}
-                {% for child in link.children %}
-                  <li><a href="{{ child.url }}"{{ child.active ? ' aria-current="page"' }}>
-                    {% if child.icon %}<span class="bi bi-{{ child.icon }}" aria-hidden="true"></span>{% endif %}
-                    <span class="mh-member-bar__item-text">{{ child.title }}</span></a></li>
-                {% endfor %}
-              </ul>
-            </details>
-          </li>
-        {% else %}
-          <li><a href="{{ link.url }}" title="{{ link.description ?: link.title }}"{{ link.active ? ' aria-current="page"' }}>
-            {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__label">{{ link.title }}</span></a></li>
-        {% endif %}
-      {% endfor %}
-    </ul>
+    {% if logo_url %}
+      <div class="mh-member-bar__logo">
+        <img src="{{ logo_url }}" alt="MakeHaven" width="381" height="54">
+      </div>
+    {% endif %}
 
     <div class="mh-member-bar__end">
       {% if dashboards %}
         <details class="mh-member-bar__drop mh-member-bar__dashboards">
-          <summary title="{{ 'Dashboards'|t }}"><span class="bi bi-speedometer2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Dashboards'|t }}</span></summary>
+          <summary title="{{ 'Your dashboards'|t }}"><span class="bi bi-speedometer2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Dashboards'|t }}</span><span class="bi bi-chevron-down mh-member-bar__caret" aria-hidden="true"></span></summary>
           <ul class="mh-member-bar__panel mh-member-bar__list">
             {% for link in dashboards %}
               <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}</a></li>
+                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}
+                <span class="mh-member-bar__item-text">{{ link.title }}{% if link.description %}<small>{{ link.description }}</small>{% endif %}</span></a></li>
             {% endfor %}
           </ul>
         </details>
@@ -112,8 +62,8 @@
         <span class="bi bi-search" aria-hidden="true"></span><span class="mh-member-bar__action-label">{{ 'Find a member page'|t }}</span>
       </a>
 
-      <a class="mh-member-bar__site" href="{{ site_url }}" title="{{ 'Public website'|t }}">
-        <span class="bi bi-globe2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Website'|t }}</span>
+      <a class="mh-member-bar__site" href="{{ site_url }}" title="{{ 'Public Website'|t }}">
+        <span class="bi bi-globe2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Public Website'|t }}</span>
       </a>
 
       <a class="mh-member-bar__me" href="{{ membership_url }}" title="{{ 'My Membership: profile, billing, badges'|t }}"{{ membership_active ? ' aria-current="page"' }}>

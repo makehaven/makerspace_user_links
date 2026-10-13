@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * The public theme's way back to the member side (see MemberBar).
+ *
+ * Rendered in the public header's red top strip for logged-in members, in
+ * place of the full member bar.
+ *
+ * Available variables:
+ * - home_url: Member Resources (node 619).
+ * - account: { title, url, icon } links; only "Switch back" while
+ *   masquerading.
+ */
+#}
+<div class="mh-member-return">
+  <a class="mh-member-return__home" href="{{ home_url }}">
+    <span class="bi bi-grid-3x3-gap-fill" aria-hidden="true"></span>{{ 'Member Resources'|t }}
+  </a>
+  {% for link in account %}
+    <a class="mh-member-return__action" href="{{ link.url }}">
+      {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}
+    </a>
+  {% endfor %}
+</div>

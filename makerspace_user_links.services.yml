@@ -11,3 +11,5 @@ services:
       - '@menu.link_tree'
       - '@current_user'
       - '@path.current'
+      - '@extension.list.theme'
+      - '@file_url_generator'

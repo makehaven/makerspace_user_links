@@ -157,7 +157,8 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
       '#groups' => $groups,
       '#attached' => ['library' => ['makerspace_user_links/menu_cards']],
       '#cache' => [
-        'contexts' => ['user.permissions', 'user.roles', 'route'],
+        // 'user': an mh_access_callback may read the viewer's own data.
+        'contexts' => ['user', 'route'],
         'tags' => ['config:system.menu.' . $menu_name],
       ],
     ];
@@ -170,7 +171,8 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
    * level (e.g. CiviCRM's /civicrm is `_access: TRUE` and enforces its own
    * permissions), so the menu access-filter cannot hide them. A link may
    * declare `options.mh_access_permission` to require a Drupal permission
-   * before its card renders.
+   * before its card renders, or `options.mh_access_callback` for a static
+   * check that takes the account.
    */
   protected function card($element): ?array {
     if (!$element->access || !$element->access->isAllowed()) {
@@ -180,6 +182,12 @@ class RoleMenuCardsBlock extends BlockBase implements ContainerFactoryPluginInte
     $options = $link->getOptions();
     $required_permission = $options['mh_access_permission'] ?? NULL;
     if ($required_permission && !$this->currentUser->hasPermission($required_permission)) {
+      return NULL;
+    }
+    // The same static visibility check the member bar honours (MemberBar),
+    // e.g. the Business dashboard only for members with a business goal.
+    $callback = $options['mh_access_callback'] ?? NULL;
+    if ($callback && is_callable($callback) && !$callback($this->currentUser)) {
       return NULL;
     }
     $icon = $options['attributes']['data-icon'] ?? $this->configuration['default_icon'];

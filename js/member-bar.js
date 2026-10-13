@@ -4,10 +4,11 @@
  *
  * - Dropdowns are native <details>, so they work without this script; it adds
  *   one-open-at-a-time and close on outside click or Escape.
- * - Fit: link widths depend on the theme's font, the viewer's roles and the
- *   length of their name, so instead of guessing breakpoints the bar measures
- *   itself: `is-tight` drops the end group's labels, and `is-compact` also
- *   drops the primary labels.
+ * - Fit: the end group's width depends on the viewer's roles (Dashboards)
+ *   and the length of their name, so instead of guessing breakpoints the bar
+ *   measures itself and sheds width in steps until nothing touches the
+ *   centred wordmark: `is-tight` turns the search input into an icon,
+ *   `is-compact` drops the labels, `is-crowded` drops the wordmark.
  */
 (function (Drupal, once) {
   Drupal.behaviors.mhMemberBar = {
@@ -33,19 +34,34 @@
             closeAll(null);
           }
         });
-        const primary = bar.querySelector('.mh-member-bar__primary');
-        const overflows = () =>
-          primary && primary.scrollWidth > primary.clientWidth + 1;
-        // Shed width in steps: first the end group's labels, then the
-        // primary labels.
-        const fit = () => {
-          bar.classList.remove('is-tight', 'is-compact');
-          if (overflows()) {
-            bar.classList.add('is-tight');
-            if (overflows()) {
-              bar.classList.add('is-compact');
-            }
+        const inner = bar.querySelector('.mh-member-bar__inner');
+        const start = bar.querySelector('.mh-member-bar__start');
+        const end = bar.querySelector('.mh-member-bar__end');
+        const logo = bar.querySelector('.mh-member-bar__logo');
+        const clear = 12;
+        const collides = () => {
+          if (inner.scrollWidth > inner.clientWidth + 1) {
+            return true;
           }
+          if (!logo || logo.offsetParent === null) {
+            return false;
+          }
+          const l = logo.getBoundingClientRect();
+          return (
+            start.getBoundingClientRect().right + clear > l.left ||
+            end.getBoundingClientRect().left - clear < l.right
+          );
+        };
+        const steps = ['is-tight', 'is-compact', 'is-crowded'];
+        const fit = () => {
+          bar.classList.remove(...steps);
+          steps.every((step) => {
+            if (!collides()) {
+              return false;
+            }
+            bar.classList.add(step);
+            return true;
+          });
         };
         fit();
         if (window.ResizeObserver) {

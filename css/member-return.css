@@ -1,0 +1,51 @@
+/**
+ * @file
+ * Public theme: the logged-in member's gold "Member Resources" button in the
+ * header's red top strip, beside the site search, where visitors see Log in.
+ * It replaces the full member bar there, so public pages keep one navigation
+ * bar and one search box.
+ */
+
+.mh-member-return {
+  display: flex;
+  align-items: center;
+  gap: var(--mh-space-xs, 0.5rem);
+}
+
+.mh-member-return a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--mh-radius-pill, 999px);
+  font-family: var(--mh-font-sans, "Montserrat", "Roboto", "Helvetica Neue", Arial, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mh-member-return .mh-member-return__home,
+.mh-member-return .mh-member-return__action {
+  background: var(--mh-color-accent-gold, #ffc658);
+  color: var(--mh-color-neutral-900, #1e1f24);
+}
+
+.mh-member-return a:hover,
+.mh-member-return a:focus-visible {
+  background: var(--mh-color-surface, #fff);
+  color: var(--mh-color-neutral-900, #1e1f24);
+  text-decoration: none;
+}
+
+.mh-member-return a:focus-visible {
+  outline: 2px solid var(--mh-color-surface, #fff);
+  outline-offset: 2px;
+}
+
+@media print {
+  .mh-member-return {
+    display: none;
+  }
+}

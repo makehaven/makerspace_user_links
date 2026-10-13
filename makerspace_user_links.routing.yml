@@ -29,8 +29,8 @@ makerspace_user_links.journey_connect:
   requirements:
     _user_is_logged_in: 'TRUE'
 
-# Open to every member; only the bar LINK is limited to members whose
-# join-form goal is selling or a business (GrowAccess::visible).
+# Open to every member; the Business dashboard entry (your-dashboards) is
+# offered only to members whose goal is selling or a business (GrowAccess).
 makerspace_user_links.journey_grow:
   path: '/member/grow'
   defaults:

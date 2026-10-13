@@ -45,7 +45,9 @@ function makerspace_user_links_theme(): array {
     'makerspace_user_links_member_bar' => [
       'variables' => [
         'home_url' => '',
+        'home_active' => FALSE,
         'site_url' => '',
+        'logo_url' => '',
         'search_url' => '',
         'primary' => [],
         'dashboards' => [],
@@ -56,6 +58,13 @@ function makerspace_user_links_theme(): array {
       ],
       'template' => 'member-bar',
     ],
+    'makerspace_user_links_member_return' => [
+      'variables' => [
+        'home_url' => '',
+        'account' => [],
+      ],
+      'template' => 'member-return',
+    ],
   ];
 }
 
@@ -63,8 +72,10 @@ function makerspace_user_links_theme(): array {
  * Implements hook_page_top().
  *
  * Puts the member bar above every page a logged-in person sees in the member
- * (Gin) and public (d11) themes, for everyone WITHOUT core's Navigation
- * sidebar. Staff (`access navigation`) get the sidebar only; see MemberBar.
+ * (Gin) theme, for everyone WITHOUT core's Navigation sidebar. Staff
+ * (`access navigation`) get the sidebar only; see MemberBar. Public (d11)
+ * pages get the Member Resources button instead; see
+ * makerspace_user_links_preprocess_page().
  */
 function makerspace_user_links_page_top(array &$page_top): void {
   $account = \Drupal::currentUser();
@@ -78,6 +89,26 @@ function makerspace_user_links_page_top(array &$page_top): void {
     return;
   }
   $page_top['makerspace_member_bar'] = \Drupal::service('makerspace_user_links.member_bar')->placeholder();
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page.
+ *
+ * On the public theme a logged-in member gets one gold "Member Resources"
+ * button in the header's red top strip, beside the site search (where
+ * visitors see Log in), rather than the whole member bar: public pages keep
+ * a single navigation bar and a single search box (JR 2026-10-13).
+ */
+function makerspace_user_links_preprocess_page(array &$variables): void {
+  if (\Drupal::theme()->getActiveTheme()->getName() !== MemberBar::PUBLIC_THEME) {
+    return;
+  }
+  // The lazy builder decides per viewer; anonymous visitors and staff (who
+  // have the Navigation sidebar) get nothing.
+  if (\Drupal::currentUser()->isAnonymous()) {
+    return;
+  }
+  $variables['page']['top_header']['makerspace_member_return'] = \Drupal::service('makerspace_user_links.member_bar')->publicReturnPlaceholder();
 }
 
 /**

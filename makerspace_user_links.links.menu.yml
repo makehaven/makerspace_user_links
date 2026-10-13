@@ -40,6 +40,45 @@ makerspace_user_links.dash.facilitator:
     attributes:
       data-icon: calendar-check
 
+# Lending: borrowers see their loans, librarians the library manager (route
+# access: 'administer lending library configuration' OR 'manage lending
+# library fees'). Every member may open /library/borrowed, so the borrower
+# entry is gated on the borrower role's permission.
+makerspace_user_links.dash.borrowed:
+  title: 'Borrowed tools'
+  description: 'Lending library tools you have out, due dates and returns.'
+  url: 'internal:/library/borrowed'
+  menu_name: your-dashboards
+  weight: 23
+  options:
+    mh_access_permission: 'create library_transaction entities'
+    attributes:
+      data-icon: box-seam
+
+makerspace_user_links.dash.library_manager:
+  title: 'Library manager'
+  description: 'Loans, overdue tools, fees and batteries.'
+  route_name: lending_library.dashboard
+  menu_name: your-dashboards
+  weight: 24
+  options:
+    attributes:
+      data-icon: clipboard-data
+
+# Every member holds 'access entrepreneur dashboard', so the bar offers it to
+# business-role holders, staff and members whose goal is selling or a
+# business (GrowAccess), as the Grow journey does.
+makerspace_user_links.dash.business:
+  title: 'Business dashboard'
+  description: 'Your business profile, products and ecosystem links.'
+  route_name: makerspace_entrepreneur_dashboard.member
+  menu_name: your-dashboards
+  weight: 25
+  options:
+    mh_access_callback: '\Drupal\makerspace_user_links\Access\GrowAccess::visible'
+    attributes:
+      data-icon: briefcase
+
 makerspace_user_links.dash.civicrm:
   title: 'CiviCRM'
   description: 'Contacts, contributions, events, and mailings.'
@@ -111,56 +150,10 @@ makerspace_user_links.dash.site_admin:
     attributes:
       data-icon: sliders
 
-# Member bar (MemberBar): the navigation every logged-in person without
-# core's Navigation sidebar gets. Grouping "B" (JR 2026-10-06): four journey
-# areas; the member's NAME opens My Membership. Grow only shows for members
-# whose goal is selling or a business (route access, GrowAccess). Give every
-# link a data-icon: on narrow screens the primary links show icons only.
-makerspace_user_links.bar.make:
-  title: 'Make'
-  description: 'Tools, rooms, materials and help in the shop.'
-  route_name: makerspace_user_links.journey_make
-  menu_name: member-nav
-  weight: 0
-  options:
-    mh_quick_menu: journey-make
-    attributes:
-      data-icon: hammer
-
-makerspace_user_links.bar.learn:
-  title: 'Learn'
-  description: 'Badges, checkouts and classes.'
-  route_name: makerspace_user_links.journey_learn
-  menu_name: member-nav
-  weight: 10
-  options:
-    mh_quick_menu: journey-learn
-    attributes:
-      data-icon: mortarboard
-
-makerspace_user_links.bar.connect:
-  title: 'Connect'
-  description: 'Volunteer, meet members, invite friends.'
-  route_name: makerspace_user_links.journey_connect
-  menu_name: member-nav
-  weight: 20
-  options:
-    mh_quick_menu: journey-connect
-    attributes:
-      data-icon: people
-
-makerspace_user_links.bar.grow:
-  title: 'Grow'
-  description: 'Sell what you make; build a business.'
-  route_name: makerspace_user_links.journey_grow
-  menu_name: member-nav
-  weight: 30
-  options:
-    mh_quick_menu: journey-grow
-    mh_access_callback: '\Drupal\makerspace_user_links\Access\GrowAccess::visible'
-    attributes:
-      data-icon: graph-up-arrow
-
+# Member bar (MemberBar): the member-nav menu is the optional slot beside the
+# gold Member Resources button. The Make / Learn / Connect / Grow dropdowns
+# left the bar (JR 2026-10-13): Member Resources lists every journey in full,
+# and the journey-* menus below still feed it and the /member/* pages.
 makerspace_user_links.account.unmasquerade:
   title: 'Switch back'
   route_name: masquerade.unmasquerade
@@ -383,19 +376,17 @@ makerspace_user_links.make.tools:
   parent: makerspace_user_links.make.group_shop
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: tools
 
 makerspace_user_links.make.whos_on:
-  title: 'Who''s on'
+  title: 'Facilitator Schedule'
   description: 'Facilitator schedule: who is on duty when.'
   route_name: view.facilitator_schedules.facilitator_schedule
   menu_name: journey-make
   parent: makerspace_user_links.make.group_shop
   weight: 10
   options:
-    mh_quick: true
     attributes:
       data-icon: person-check
 
@@ -407,7 +398,6 @@ makerspace_user_links.make.reservations:
   parent: makerspace_user_links.make.group_shop
   weight: 20
   options:
-    mh_quick: true
     attributes:
       data-icon: calendar-plus
 
@@ -436,7 +426,6 @@ makerspace_user_links.make.store:
   parent: makerspace_user_links.make.group_materials
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: bag
 
@@ -448,7 +437,6 @@ makerspace_user_links.make.printing:
   parent: makerspace_user_links.make.group_materials
   weight: 10
   options:
-    mh_quick: true
     attributes:
       data-icon: printer
 
@@ -601,7 +589,6 @@ makerspace_user_links.learn.my_badges:
   parent: makerspace_user_links.learn.group_badges
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: award
 
@@ -613,7 +600,6 @@ makerspace_user_links.learn.complete:
   parent: makerspace_user_links.learn.group_badges
   weight: 10
   options:
-    mh_quick: true
     attributes:
       data-icon: check2-circle
 
@@ -625,7 +611,6 @@ makerspace_user_links.learn.appointments:
   parent: makerspace_user_links.learn.group_badges
   weight: 20
   options:
-    mh_quick: true
     attributes:
       data-icon: calendar-check
 
@@ -654,7 +639,6 @@ makerspace_user_links.learn.classes:
   parent: makerspace_user_links.learn.group_classes
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: calendar-event
 
@@ -744,7 +728,6 @@ makerspace_user_links.connect.board:
   parent: makerspace_user_links.connect.group_volunteer
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: hand-thumbs-up
 
@@ -850,7 +833,6 @@ makerspace_user_links.connect.members:
   parent: makerspace_user_links.connect.group_community
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: people
 
@@ -862,7 +844,6 @@ makerspace_user_links.connect.slack:
   parent: makerspace_user_links.connect.group_community
   weight: 10
   options:
-    mh_quick: true
     attributes:
       data-icon: slack
 
@@ -924,7 +905,6 @@ makerspace_user_links.connect.refer:
   parent: makerspace_user_links.connect.group_invite
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: person-plus
 
@@ -953,7 +933,6 @@ makerspace_user_links.grow.dashboard:
   parent: makerspace_user_links.grow.group_business
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: briefcase
 
@@ -965,7 +944,6 @@ makerspace_user_links.grow.list:
   parent: makerspace_user_links.grow.group_business
   weight: 10
   options:
-    mh_quick: true
     attributes:
       data-icon: shop
 
@@ -983,7 +961,6 @@ makerspace_user_links.grow.shop_local:
   parent: makerspace_user_links.grow.group_sell
   weight: 0
   options:
-    mh_quick: true
     attributes:
       data-icon: basket
 
