@@ -13,3 +13,8 @@ services:
       - '@path.current'
       - '@extension.list.theme'
       - '@file_url_generator'
+
+  makerspace_user_links.route_subscriber:
+    class: Drupal\makerspace_user_links\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

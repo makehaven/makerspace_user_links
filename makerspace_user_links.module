@@ -5,7 +5,11 @@
  * Entry point for makerspace_user_links module.
  */
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\node\NodeInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -353,6 +357,102 @@ function makerspace_user_links_makerspace_user_links_links(UserInterface $accoun
   }
 
   return $links;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node.
+ *
+ * Until staff approve a new account (member_pending_approval, no member
+ * role yet), every link on Member Resources is greyed out and nothing said
+ * why (staff feedback 2026-08). Say so at the top of the page.
+ */
+function makerspace_user_links_node_view(array &$build, NodeInterface $node, EntityViewDisplayInterface $display, string $view_mode): void {
+  if ($view_mode !== 'full') {
+    return;
+  }
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $node->id());
+  if ($alias !== '/member/resources') {
+    return;
+  }
+  $build['#cache']['contexts'][] = 'user.roles';
+  $account = \Drupal::currentUser();
+  if (!$account->hasRole('member_pending_approval') || $account->hasRole('member')) {
+    return;
+  }
+  // A plain inline notice: the public theme turns status messages into a
+  // corner toast that fades, and this has to stay beside the greyed links.
+  $build['makerspace_pending_notice'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'div',
+    '#attributes' => ['class' => ['alert', 'alert-info', 'mh-pending-notice'], 'role' => 'status'],
+    '#value' => t('Your membership will be verified by a staff member soon. This page opens up once that is done. Questions? Email <a href=":mail">membership@makehaven.org</a>.', [':mail' => 'mailto:membership@makehaven.org']),
+    '#weight' => -100,
+  ];
+}
+
+/**
+ * Implements hook_entity_operation().
+ *
+ * Adds "Member page" (/user/{uid}/main) to the row menu on the people list,
+ * beside Edit, View and Masquerade as, so staff reach it in one click.
+ */
+function makerspace_user_links_entity_operation(EntityInterface $entity): array {
+  if (!$entity instanceof UserInterface || $entity->isAnonymous() || !\Drupal::moduleHandler()->moduleExists('profile')) {
+    return [];
+  }
+  $url = Url::fromRoute('profile.user_page.single', [
+    'user' => $entity->id(),
+    'profile_type' => 'main',
+  ]);
+  if (!$url->access()) {
+    return [];
+  }
+  return [
+    'makerspace_member_page' => [
+      'title' => t('Member page'),
+      'url' => $url,
+      'weight' => 20,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for user_form.
+ *
+ * The profile photo, bio and interests live on the member profile
+ * (/user/{uid}/main), not the account form, and nothing on the account form
+ * said so: a member looking for where to add a photo gave up (2026-09).
+ */
+function makerspace_user_links_form_user_form_alter(array &$form, FormStateInterface $form_state): void {
+  $account = $form_state->getFormObject()->getEntity();
+  if (!$account instanceof UserInterface || $account->isNew() || !\Drupal::moduleHandler()->moduleExists('profile')) {
+    return;
+  }
+  $url = Url::fromRoute('profile.user_page.single', [
+    'user' => $account->id(),
+    'profile_type' => 'main',
+  ]);
+  if (!$url->access()) {
+    return;
+  }
+  $own = (int) $account->id() === (int) \Drupal::currentUser()->id();
+  $form['makerspace_member_profile_pointer'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'p',
+    '#weight' => -100,
+    '#attributes' => ['class' => ['mh-member-profile-pointer']],
+    'text' => [
+      '#markup' => $own
+        ? t('Looking for your profile photo, bio or interests? They are on your member profile.')
+        : t('Profile photo, bio and interests are on the member profile.'),
+      '#suffix' => ' ',
+    ],
+    'link' => [
+      '#type' => 'link',
+      '#title' => $own ? t('Edit your member profile') : t('Edit member profile'),
+      '#url' => $url,
+    ],
+  ];
 }
 
 /**
