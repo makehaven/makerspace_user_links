@@ -764,17 +764,6 @@ makerspace_user_links.connect.log_fix:
     attributes:
       data-icon: wrench
 
-makerspace_user_links.connect.tabling:
-  title: 'Table for MakeHaven'
-  description: 'Represent MakeHaven at events.'
-  url: 'internal:/tabling'
-  menu_name: journey-connect
-  parent: makerspace_user_links.connect.group_volunteer
-  weight: 40
-  options:
-    attributes:
-      data-icon: megaphone
-
 makerspace_user_links.connect.facilitate:
   title: 'Become a facilitator'
   description: 'Volunteer to help members reach their goals.'
