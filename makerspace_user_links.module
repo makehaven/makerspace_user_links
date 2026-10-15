@@ -456,6 +456,58 @@ function makerspace_user_links_form_user_form_alter(array &$form, FormStateInter
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for menu_edit_form.
+ *
+ * Since 2026-10-06 the member bar, journey pages and Member Resources are
+ * built from the menus below, whose links are defined in this module's
+ * links.menu.yml. Staff looking in the old Member menu could not find them
+ * (2026-10-14: a dead "Table for MakeHaven" link), so the Member menu and
+ * each of these menus point to all of them and say what can be edited here.
+ */
+function makerspace_user_links_form_menu_edit_form_alter(array &$form, FormStateInterface $form_state): void {
+  $menus = [
+    'member-nav' => t('Member bar'),
+    'journey-make' => t('Make'),
+    'journey-learn' => t('Learn'),
+    'journey-connect' => t('Connect'),
+    'journey-grow' => t('Grow'),
+    'member-membership' => t('My Membership'),
+    'member-account' => t('Member account'),
+  ];
+  $current = $form_state->getFormObject()->getEntity()->id();
+  if ($current !== 'menu-member-menu' && !isset($menus[$current])) {
+    return;
+  }
+  $items = [];
+  foreach ($menus as $id => $label) {
+    $items[] = $id === $current
+      ? ['#markup' => '<strong>' . $label . '</strong>']
+      : [
+        '#type' => 'link',
+        '#title' => $label,
+        '#url' => Url::fromRoute('entity.menu.edit_form', ['menu' => $id]),
+      ];
+  }
+  $form['makerspace_member_menus'] = [
+    '#type' => 'container',
+    '#weight' => -100,
+    '#attributes' => ['class' => ['messages', 'messages--status']],
+    'text' => [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => $current === 'menu-member-menu'
+        ? t('The member bar, journey pages and Member Resources are not built from this menu. Edit their links here:')
+        : t('Links that come with the site can be turned on or off, reordered or moved here; their title and address are set in code. Links added with "Add link" are fully editable. Other member menus:'),
+    ],
+    'menus' => [
+      '#theme' => 'item_list',
+      '#items' => $items,
+      '#attributes' => ['class' => ['inline']],
+    ],
+  ];
+}
+
+/**
  * Determines whether a viewer can masquerade as the given account.
  */
 function makerspace_user_links_can_masquerade(UserInterface $account, AccountInterface $viewer): bool {
