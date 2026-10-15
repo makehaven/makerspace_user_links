@@ -466,6 +466,7 @@ function makerspace_user_links_form_user_form_alter(array &$form, FormStateInter
  */
 function makerspace_user_links_form_menu_edit_form_alter(array &$form, FormStateInterface $form_state): void {
   $menus = [
+    'your-dashboards' => t('Dashboards'),
     'member-nav' => t('Member bar'),
     'journey-make' => t('Make'),
     'journey-learn' => t('Learn'),
@@ -496,7 +497,7 @@ function makerspace_user_links_form_menu_edit_form_alter(array &$form, FormState
       '#type' => 'html_tag',
       '#tag' => 'p',
       '#value' => $current === 'menu-member-menu'
-        ? t('The member bar, journey pages and Member Resources are not built from this menu. Edit their links here:')
+        ? t('The member bar, Dashboards, journey pages and Member Resources are not built from this menu. Edit their links here:')
         : t('Links that come with the site can be turned on or off, reordered or moved here; their title and address are set in code. Links added with "Add link" are fully editable. Other member menus:'),
     ],
     'menus' => [
@@ -505,6 +506,29 @@ function makerspace_user_links_form_menu_edit_form_alter(array &$form, FormState
       '#attributes' => ['class' => ['inline']],
     ],
   ];
+}
+
+/**
+ * Implements hook_navigation_menu_link_tree_alter().
+ *
+ * The staff sidebar shows the your-dashboards menu too (2026-10-14). Route
+ * access alone lets anyone open some of its links (CiviCRM gates itself,
+ * Borrowed tools and Facilitator utilities are open pages), so apply the
+ * same mh_access_permission filter the member bar uses. mh_access_callback
+ * is not applied: its only user, GrowAccess, passes everyone with the
+ * sidebar, and a per-user check would need a per-user cache context.
+ */
+function makerspace_user_links_navigation_menu_link_tree_alter(array &$tree): void {
+  $account = \Drupal::currentUser();
+  foreach ($tree as $key => $element) {
+    if ($element->link->getMenuName() !== 'your-dashboards') {
+      continue;
+    }
+    $permission = $element->link->getOptions()['mh_access_permission'] ?? NULL;
+    if ($permission && !$account->hasPermission($permission)) {
+      unset($tree[$key]);
+    }
+  }
 }
 
 /**

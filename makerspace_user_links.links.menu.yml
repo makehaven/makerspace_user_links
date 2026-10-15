@@ -150,6 +150,49 @@ makerspace_user_links.dash.site_admin:
     attributes:
       data-icon: sliders
 
+# Added 2026-10-14 (JR): staff dashboards that had no launcher entry. Each
+# route's own permission gates it: programs/workshops (event_management,
+# manager), badger (facilitator), member success (data, manager, special).
+makerspace_user_links.dash.programs:
+  title: 'Programs'
+  description: 'GEMS, Foundations, Pathway to Trades: runs, cohorts and pending badges.'
+  route_name: makerspace_programs_dashboard.overview
+  menu_name: your-dashboards
+  weight: 11
+  options:
+    attributes:
+      data-icon: diagram-3
+
+makerspace_user_links.dash.workshops:
+  title: 'Workshops & meetups'
+  description: 'Upcoming runs to fill, the workshop catalog and meetups.'
+  route_name: makerspace_workshops_dashboard.overview
+  menu_name: your-dashboards
+  weight: 12
+  options:
+    attributes:
+      data-icon: easel
+
+makerspace_user_links.dash.badger:
+  title: 'Badger dashboard'
+  description: 'Badge requests waiting for you and your confirmed sessions.'
+  route_name: appointment_on_request.badger_dashboard
+  menu_name: your-dashboards
+  weight: 21
+  options:
+    attributes:
+      data-icon: patch-check
+
+makerspace_user_links.dash.member_success:
+  title: 'Member success'
+  description: 'Onboarding, engagement and retention queues.'
+  route_name: makerspace_member_success.dashboard
+  menu_name: your-dashboards
+  weight: 31
+  options:
+    attributes:
+      data-icon: people
+
 # Member bar (MemberBar): the member-nav menu is the optional slot beside the
 # gold Member Resources button. The Make / Learn / Connect / Grow dropdowns
 # left the bar (JR 2026-10-13): Member Resources lists every journey in full,
