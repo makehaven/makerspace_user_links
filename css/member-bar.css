@@ -375,3 +375,30 @@
 .mh-member-bar details:not([open]) > .mh-member-bar__panel {
   display: none;
 }
+
+/* Staff who also get the bar ('see member bar with navigation', 2026-10-14).
+   Core's Navigation pins its sidebar to the left edge and, from 64rem, its
+   top bar (page actions such as Edit) to the top of the window. The member
+   bar stays in the page flow: beside the sidebar, under the top bar, and it
+   scrolls away while both stay put. It sits below the top bar (490) and the
+   sidebar (501) so it never covers them while scrolling. */
+body:has(.admin-toolbar) .mh-member-bar {
+  z-index: 480;
+}
+
+@media (min-width: 64rem) {
+  body:has(.admin-toolbar) .mh-member-bar {
+    margin-inline-start: var(--drupal-displace-offset-left, var(--admin-toolbar-sidebar-width));
+  }
+
+  body:has(.top-bar__tools:not(:empty), .top-bar__context:not(:empty), .top-bar__actions:not(:empty)) .mh-member-bar {
+    margin-block-start: var(--admin-toolbar-top-bar-height);
+  }
+
+  /* Core moves the page down by the top bar's height; the member bar above
+     it has already made that room. Core's selector carries an id in :is(),
+     hence !important. */
+  body:has(.mh-member-bar) .top-bar ~ .dialog-off-canvas-main-canvas {
+    margin-block-start: 0 !important;
+  }
+}

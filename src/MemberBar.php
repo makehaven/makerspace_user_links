@@ -19,7 +19,9 @@ use Drupal\Core\Url;
  *
  * The bar replaces core's Navigation sidebar for members, facilitators,
  * instructors, borrowers and content editors. Staff roles keep
- * `access navigation` and get the sidebar INSTEAD of the bar, never both.
+ * `access navigation` and get the sidebar; those who also hold
+ * `see member bar with navigation` get the bar as well, so staff see what
+ * members see (JR 2026-10-14; dark launch to manager first). See shows().
  *
  * The bar renders in the member (Gin) theme only. The public site already has
  * its own header, navigation and search, so there a logged-in member gets just
@@ -77,6 +79,21 @@ class MemberBar implements TrustedCallbackInterface {
   }
 
   /**
+   * Whether an account gets the member bar (and the public return button).
+   *
+   * Members always do. Staff, who have core's Navigation sidebar, do only
+   * with 'see member bar with navigation'; member-bar.css then fits the bar
+   * beside the sidebar and under core's pinned top bar.
+   */
+  public static function shows(AccountInterface $account): bool {
+    if ($account->isAnonymous()) {
+      return FALSE;
+    }
+    return !$account->hasPermission('access navigation')
+      || $account->hasPermission('see member bar with navigation');
+  }
+
+  /**
    * Returns a placeholder for the bar; the bar varies per user and page.
    */
   public function placeholder(): array {
@@ -108,7 +125,7 @@ class MemberBar implements TrustedCallbackInterface {
       'contexts' => ['user.permissions', 'session.is_masquerading'],
       'tags' => ['config:system.menu.member-account'],
     ];
-    if ($this->currentUser->isAnonymous() || $this->currentUser->hasPermission('access navigation')) {
+    if (!self::shows($this->currentUser)) {
       return ['#cache' => $cache];
     }
     $switch_back = array_values(array_filter(
@@ -136,10 +153,7 @@ class MemberBar implements TrustedCallbackInterface {
         'config:system.menu.your-dashboards',
       ],
     ];
-    // Staff keep core's Navigation sidebar and get no bar. Core pins the
-    // sidebar and its top bar (page actions such as Edit) to the top of the
-    // window, so the two cannot share it, and staff asked for fewer menus.
-    if ($this->currentUser->isAnonymous() || $this->currentUser->hasPermission('access navigation')) {
+    if (!self::shows($this->currentUser)) {
       return ['#cache' => $cache];
     }
 
