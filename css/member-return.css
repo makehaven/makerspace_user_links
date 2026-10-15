@@ -1,10 +1,18 @@
 /**
  * @file
  * Public theme: the logged-in member's gold "Member Resources" button in the
- * header's red top strip, beside the site search, where visitors see Log in.
+ * header's red top strip, at its left corner (the search stays right).
  * It replaces the full member bar there, so public pages keep one navigation
  * bar and one search box.
  */
+
+/* The strip's region is right-aligned (beside the search). Pull it left so
+   the button sits in the top-left corner, as it does in the member bar
+   (JR 2026-10-14). */
+#navbar-top .region-top-header:has(> .mh-member-return) {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+}
 
 .mh-member-return {
   display: flex;

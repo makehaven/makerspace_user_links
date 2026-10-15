@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\makerspace_user_links\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -69,6 +70,24 @@ class MemberAttentionBlock extends BlockBase implements ContainerFactoryPluginIn
       $container->get('module_handler'),
       $container->get('current_user')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Declared on the plugin, not only in build(): an empty build() carries no
+   * cache metadata, so without these the "nothing to show" result of the
+   * first visitor after a cache clear was cached for everyone, forever.
+   */
+  public function getCacheContexts(): array {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['user']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge(): int {
+    return Cache::mergeMaxAges(parent::getCacheMaxAge(), 300);
   }
 
   /**
