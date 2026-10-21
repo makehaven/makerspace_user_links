@@ -258,6 +258,13 @@
   background: var(--mhb-panel-bg);
   color: var(--mhb-panel-fg);
   box-shadow: var(--mh-shadow-md, 0 6px 20px rgb(19 19 20 / 0.12));
+  /* A manager's list runs to ~16 dashboards: scroll inside the panel rather
+     than past the bottom of the screen. dvh, not vh: on phones vh includes
+     the space under the browser's toolbars. */
+  max-height: calc(100vh - 4.5rem);
+  max-height: calc(100dvh - 4.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .mh-member-bar__panel a {
@@ -329,8 +336,29 @@
     left: 0.5rem;
     right: 0.5rem;
     top: calc(100% + 0.25rem);
-    max-height: calc(100vh - 4rem);
-    overflow-y: auto;
+  }
+
+  /* Phones: titles only, two to a row, so the whole list fits on one screen
+     (with descriptions a manager's list ran three screens long). */
+  .mh-member-bar__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.125rem;
+  }
+
+  .mh-member-bar__panel a {
+    align-items: center;
+    height: 100%;
+    padding: 0.6rem 0.5rem;
+  }
+
+  .mh-member-bar__panel .bi {
+    flex: none;
+    margin-top: 0;
+  }
+
+  .mh-member-bar__item-text small {
+    display: none;
   }
 }
 
