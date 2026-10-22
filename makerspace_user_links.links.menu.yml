@@ -310,8 +310,8 @@ makerspace_user_links.membership.share:
       data-icon: plus-circle
 
 makerspace_user_links.membership.profile:
-  title: 'My member profile'
-  description: 'Photo, bio, interests and skills others see.'
+  title: 'Edit my member profile'
+  description: 'Photo, bio, interests, skills and who can see them.'
   route_name: user_current_paths.wildcardaction_redirect
   route_parameters:
     wildcardaction: main
@@ -321,6 +321,17 @@ makerspace_user_links.membership.profile:
   options:
     attributes:
       data-icon: person-vcard
+
+makerspace_user_links.membership.profile_view:
+  title: 'See my profile'
+  description: 'Your profile page the way other members see it.'
+  route_name: user.page
+  menu_name: member-membership
+  parent: makerspace_user_links.membership.group_account
+  weight: 1
+  options:
+    attributes:
+      data-icon: eye
 
 makerspace_user_links.membership.settings:
   title: 'Login, email and texts'

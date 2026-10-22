@@ -1,3 +1,6 @@
 see member bar with navigation:
   title: 'See the member bar alongside the staff sidebar'
   description: 'Staff with the Navigation sidebar also get the member bar on member pages and the Member Resources button on public pages, so they see what members see. Dark launch 2026-10: manager first, then all staff roles.'
+view members only profiles:
+  title: 'See member profiles set to Members Only'
+  description: 'Member profile pages (/user/{uid}) set to "Members Only", and the pages of people who are not current members, open only to this permission (current members get it through the member role), to staff who administer users, and to the person. Everyone else gets Access denied. Public profiles of current members stay open to all.'

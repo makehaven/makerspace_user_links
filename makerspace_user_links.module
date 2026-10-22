@@ -5,6 +5,8 @@
  * Entry point for makerspace_user_links module.
  */
 
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -13,6 +15,7 @@ use Drupal\node\NodeInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\makerspace_user_links\Access\ProfileVisibility;
 use Drupal\makerspace_user_links\MemberBar;
 
 /**
@@ -255,6 +258,17 @@ function makerspace_user_links_makerspace_user_links_links(UserInterface $accoun
         'category' => t('Quick Links'),
         'weight' => -100,
       ];
+      // Offered on the edit pages; the profile page itself needs no self-link.
+      $links[] = [
+        'access' => \Drupal::routeMatch()->getRouteName() !== 'entity.user.canonical',
+        'id' => 'view_profile',
+        'title' => t('See My Profile'),
+        'route_name' => 'entity.user.canonical',
+        'route_parameters' => $route_parameters,
+        'category' => t('Quick Links'),
+        'weight' => -99,
+        'description' => t('Your profile page the way other members see it.'),
+      ];
 
       if (\Drupal::moduleHandler()->moduleExists('makerspace_material_store')) {
         $links[] = [
@@ -410,6 +424,79 @@ function makerspace_user_links_entity_operation(EntityInterface $entity): array 
       'url' => $url,
       'weight' => 20,
     ],
+  ];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for user.
+ *
+ * The theme builds the member page from the main profile, badge requests and
+ * the instructor profile, and shows the member a note about their own page
+ * (barrio_boostrap_5_makehaven_d11_preprocess_user()). A theme cannot bubble
+ * cache metadata from preprocess, so vary and invalidate the full view here.
+ */
+function makerspace_user_links_user_view(array &$build, UserInterface $account, EntityViewDisplayInterface $display, string $view_mode): void {
+  if ($view_mode !== 'full') {
+    return;
+  }
+  $build['#cache']['contexts'][] = 'user';
+  $build['#cache']['contexts'][] = 'route';
+  $build['#cache']['tags'][] = 'profile_list';
+  $build['#cache']['tags'][] = 'node_list:badge_request';
+  if ($main = ProfileVisibility::mainProfile($account)) {
+    $build['#cache']['tags'] = array_merge($build['#cache']['tags'], $main->getCacheTags());
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access() for profile.
+ *
+ * A main profile follows the same Public / Members Only rule as its owner's
+ * account page (ProfileVisibility), so /profile/{id} and anything embedding
+ * the profile cannot show what the account page withholds.
+ */
+function makerspace_user_links_profile_access(EntityInterface $profile, string $operation, AccountInterface $account): AccessResultInterface {
+  if ($operation !== 'view' || $profile->bundle() !== 'main' || !$profile->getOwner()) {
+    return AccessResult::neutral();
+  }
+  $result = ProfileVisibility::access($profile->getOwner(), $account);
+  return $result->isAllowed()
+    ? AccessResult::neutral()->addCacheableDependency($result)
+    : AccessResult::forbidden('Member profile privacy')->addCacheableDependency($result);
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for profile_form.
+ *
+ * Members edited their profile at /user/{uid}/main and had no way to see the
+ * result: the account page was not linked from anywhere (2026-10-22). Point
+ * from the edit form to the page others see, and say who can see it.
+ */
+function makerspace_user_links_form_profile_form_alter(array &$form, FormStateInterface $form_state): void {
+  $profile = $form_state->getFormObject()->getEntity();
+  if ($profile->bundle() !== 'main' || $profile->isNew() || !$profile->getOwner()) {
+    return;
+  }
+  $owner = $profile->getOwner();
+  $own = (int) $owner->id() === (int) \Drupal::currentUser()->id();
+  $public = ProfileVisibility::isPublic($profile) && $owner->hasRole(ProfileVisibility::MEMBER_ROLE);
+  $form['makerspace_profile_preview'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'p',
+    '#weight' => -100,
+    '#attributes' => ['class' => ['mh-member-profile-pointer']],
+    'link' => [
+      '#type' => 'link',
+      '#title' => $own ? t('See your profile as others see it') : t('See this profile page'),
+      '#url' => $owner->toUrl(),
+      '#suffix' => ' ',
+    ],
+    'who' => [
+      '#markup' => $public
+        ? t('(visible to anyone: the privacy setting below is Public)')
+        : t('(visible to MakeHaven members only: change the privacy setting below to make it public)'),
+    ],
+    '#cache' => ['tags' => $profile->getCacheTags()],
   ];
 }
 
