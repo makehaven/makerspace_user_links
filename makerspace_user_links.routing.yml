@@ -39,3 +39,15 @@ makerspace_user_links.journey_grow:
     journey: grow
   requirements:
     _user_is_logged_in: 'TRUE'
+
+# Open CiviCRM activities assigned to the viewer (Kate, 2026-10-22). Staff
+# also get an email per assignment; see AssignmentNotifier.
+makerspace_user_links.assigned_to_me:
+  path: '/assigned-to-me'
+  defaults:
+    _controller: '\Drupal\makerspace_user_links\Controller\AssignedToMeController::page'
+    _title: 'Assigned to me'
+  requirements:
+    _permission: 'access CiviCRM'
+  options:
+    _admin_route: TRUE

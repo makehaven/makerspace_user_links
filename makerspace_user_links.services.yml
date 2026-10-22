@@ -18,3 +18,21 @@ services:
     class: Drupal\makerspace_user_links\Routing\RouteSubscriber
     tags:
       - { name: event_subscriber }
+
+  makerspace_user_links.assigned_activities:
+    class: Drupal\makerspace_user_links\AssignedActivities\AssignedActivities
+    arguments:
+      - '@module_handler'
+
+  makerspace_user_links.assignment_notifier:
+    class: Drupal\makerspace_user_links\AssignedActivities\AssignmentNotifier
+    arguments:
+      - '@makerspace_user_links.assigned_activities'
+      - '@entity_type.manager'
+      - '@plugin.manager.mail'
+      - '@current_user'
+      - '@logger.channel.makerspace_user_links'
+
+  logger.channel.makerspace_user_links:
+    parent: logger.channel_base
+    arguments: ['makerspace_user_links']

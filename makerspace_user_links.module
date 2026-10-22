@@ -16,6 +16,7 @@ use Drupal\user\UserInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\makerspace_user_links\Access\ProfileVisibility;
+use Drupal\makerspace_user_links\AssignedActivities\AssignmentNotifier;
 use Drupal\makerspace_user_links\MemberBar;
 
 /**
@@ -182,6 +183,33 @@ function makerspace_user_links_makerspace_member_attention(AccountInterface $acc
     }
     catch (\Throwable $e) {
       \Drupal::logger('makerspace_user_links')->warning('Member attention (tab) failed: @m', ['@m' => $e->getMessage()]);
+    }
+  }
+
+  // Open CiviCRM activities assigned to a staff member (Kate, 2026-10-22:
+  // real tasks would sink among thousands of filed records).
+  if ($account->hasPermission('access CiviCRM')) {
+    try {
+      $assigned = \Drupal::service('makerspace_user_links.assigned_activities');
+      if ($contact_id = $assigned->contactId($account)) {
+        $counts = $assigned->counts($contact_id);
+        if ($counts['open'] > 0) {
+          $items[] = [
+            'id' => 'civicrm_assigned',
+            'severity' => $counts['overdue'] > 0 ? 'warning' : 'info',
+            'message' => $counts['overdue'] > 0
+              ? \Drupal::translation()->formatPlural($counts['open'], 'You have 1 open CiviCRM item assigned to you (@overdue overdue).', 'You have @count open CiviCRM items assigned to you (@overdue overdue).', ['@overdue' => $counts['overdue']])
+              : \Drupal::translation()->formatPlural($counts['open'], 'You have 1 open CiviCRM item assigned to you.', 'You have @count open CiviCRM items assigned to you.'),
+            'action_label' => t('See what is assigned to you'),
+            'action_url' => Url::fromRoute('makerspace_user_links.assigned_to_me'),
+            'icon' => 'list-check',
+            'weight' => 20,
+          ];
+        }
+      }
+    }
+    catch (\Throwable $e) {
+      \Drupal::logger('makerspace_user_links')->warning('Member attention (assigned activities) failed: @m', ['@m' => $e->getMessage()]);
     }
   }
 
@@ -703,4 +731,42 @@ function makerspace_user_links_webform_submission_presave($webform_submission): 
   $data['reported_by_name'] = $original->getDisplayName();
   $data['reported_by_mail'] = (string) $original->getEmail();
   $webform_submission->setData($data);
+}
+
+/**
+ * Implements hook_civicrm_post().
+ *
+ * Each new assignee row of an activity, however it was written (form, API,
+ * CiviRules), queues an email to that person; see AssignmentNotifier.
+ */
+function makerspace_user_links_civicrm_post(string $op, string $objectName, $objectId, &$objectRef): void {
+  if ($op !== 'create' || $objectName !== 'ActivityContact' || !is_object($objectRef)) {
+    return;
+  }
+  $assignee = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees');
+  if ((int) ($objectRef->record_type_id ?? 0) !== (int) $assignee) {
+    return;
+  }
+  \Drupal::service('makerspace_user_links.assignment_notifier')->assigned((int) $objectRef->activity_id, (int) $objectRef->contact_id);
+}
+
+/**
+ * Implements hook_civicrm_alterMailParams().
+ *
+ * Notes whom CiviCRM's activity form emailed its own assignee copy
+ * (workflow case_activity), so they do not get a second email from us.
+ */
+function makerspace_user_links_civicrm_alterMailParams(array &$params, $context = NULL): void {
+  if ($context === 'messageTemplate' && ($params['workflow'] ?? $params['valueName'] ?? '') === 'case_activity' && !empty($params['contactId'])) {
+    \Drupal::service('makerspace_user_links.assignment_notifier')->civicrmSent((int) $params['contactId']);
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function makerspace_user_links_mail(string $key, array &$message, array $params): void {
+  if ($key === 'activity_assigned') {
+    AssignmentNotifier::message($message, $params);
+  }
 }

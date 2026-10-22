@@ -90,6 +90,16 @@ makerspace_user_links.dash.civicrm:
     attributes:
       data-icon: people
 
+makerspace_user_links.dash.assigned_to_me:
+  title: 'Assigned to me'
+  description: 'Open CiviCRM activities assigned to you, soonest first.'
+  route_name: makerspace_user_links.assigned_to_me
+  menu_name: your-dashboards
+  weight: 31
+  options:
+    attributes:
+      data-icon: list-check
+
 makerspace_user_links.dash.facilitator_utilities:
   title: 'Facilitator utilities'
   description: 'Badge approvals, member search, nametags and guides.'
