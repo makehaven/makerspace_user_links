@@ -222,6 +222,17 @@
   background: var(--mhb-hover);
 }
 
+/* Public Website leaves the member area, so it reads as a button rather than
+   as more bar text (Lior, feedback sid 20817). */
+.mh-member-bar__site {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+.mh-member-bar__site:hover,
+.mh-member-bar__site:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--mhb-fg);
+}
+
 .mh-member-bar__me[aria-current="page"] {
   box-shadow: inset 0 -3px 0 var(--mhb-gold);
 }
