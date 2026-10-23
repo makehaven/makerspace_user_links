@@ -284,6 +284,21 @@
   width: 24rem;
 }
 
+.mh-member-bar__group {
+  padding: 0.5rem 0.6rem 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mh-color-neutral-600, #5c5f66);
+}
+
+.mh-member-bar__group:not(:first-child) {
+  margin-top: 0.35rem;
+  border-top: 1px solid var(--mhb-border);
+  padding-top: 0.6rem;
+}
+
 .mh-member-bar__panel a {
   display: flex;
   align-items: flex-start;

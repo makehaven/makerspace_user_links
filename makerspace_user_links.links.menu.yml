@@ -10,13 +10,20 @@
 # code-defined "lead dashboard" links were removed from here (they would have
 # been self-links on those pages); the launcher row below is the single entry
 # point to each dashboard.
+#
+# The bar's Dashboards menu splits into "Mine" (mh_dash_group: mine — your own
+# work) and "Running the space" (everything else) when a person has both, so
+# the long staff list leads with what is theirs (2026-10-23).
+# mh_hide_with_sidebar drops a link for people who already have it in the
+# Navigation sidebar (Content, Administration).
 makerspace_user_links.dash.staff_tools:
   title: 'Staff Tools Dashboard'
   description: 'All staff reports, queues, and operational tools in one organized place.'
   route_name: makerspace_staff_tools.dashboard
   menu_name: your-dashboards
-  weight: 0
+  weight: 20
   options:
+    mh_dash_group: space
     attributes:
       data-icon: tools
 
@@ -25,8 +32,9 @@ makerspace_user_links.dash.instructor:
   description: 'Your classes, attendance, and post-event tasks.'
   route_name: instructor_companion.dashboard
   menu_name: your-dashboards
-  weight: 10
+  weight: 2
   options:
+    mh_dash_group: mine
     attributes:
       data-icon: mortarboard
 
@@ -35,8 +43,9 @@ makerspace_user_links.dash.facilitator:
   description: 'Your appointments, availability, and facilitation stats.'
   route_name: appointment_facilitator.dashboard
   menu_name: your-dashboards
-  weight: 20
+  weight: 3
   options:
+    mh_dash_group: mine
     attributes:
       data-icon: calendar-check
 
@@ -49,8 +58,9 @@ makerspace_user_links.dash.borrowed:
   description: 'Lending library tools you have out, due dates and returns.'
   url: 'internal:/library/borrowed'
   menu_name: your-dashboards
-  weight: 23
+  weight: 8
   options:
+    mh_dash_group: mine
     mh_access_permission: 'create library_transaction entities'
     attributes:
       data-icon: box-seam
@@ -62,6 +72,7 @@ makerspace_user_links.dash.library_manager:
   menu_name: your-dashboards
   weight: 24
   options:
+    mh_dash_group: space
     attributes:
       data-icon: clipboard-data
 
@@ -73,8 +84,9 @@ makerspace_user_links.dash.business:
   description: 'Your business profile, products and ecosystem links.'
   route_name: makerspace_entrepreneur_dashboard.member
   menu_name: your-dashboards
-  weight: 25
+  weight: 7
   options:
+    mh_dash_group: mine
     mh_access_callback: '\Drupal\makerspace_user_links\Access\GrowAccess::visible'
     attributes:
       data-icon: briefcase
@@ -84,8 +96,9 @@ makerspace_user_links.dash.civicrm:
   description: 'Contacts, contributions, events, and mailings.'
   url: 'internal:/civicrm'
   menu_name: your-dashboards
-  weight: 30
+  weight: 28
   options:
+    mh_dash_group: space
     mh_access_permission: 'access CiviCRM'
     attributes:
       data-icon: people
@@ -95,8 +108,9 @@ makerspace_user_links.dash.assigned_to_me:
   description: 'Open CiviCRM activities assigned to you, soonest first.'
   route_name: makerspace_user_links.assigned_to_me
   menu_name: your-dashboards
-  weight: 31
+  weight: 1
   options:
+    mh_dash_group: mine
     attributes:
       data-icon: list-check
 
@@ -107,8 +121,9 @@ makerspace_user_links.dash.facilitator_utilities:
   route_parameters:
     node: '34702'
   menu_name: your-dashboards
-  weight: 21
+  weight: 5
   options:
+    mh_dash_group: mine
     mh_access_permission: 'view own facilitator stats'
     attributes:
       data-icon: wrench-adjustable
@@ -118,8 +133,9 @@ makerspace_user_links.dash.equipment_status:
   description: 'What is up, down or waiting on repair.'
   route_name: asset_status.tool_status_board
   menu_name: your-dashboards
-  weight: 22
+  weight: 6
   options:
+    mh_dash_group: mine
     mh_access_permission: 'view own facilitator stats'
     attributes:
       data-icon: activity
@@ -129,8 +145,10 @@ makerspace_user_links.dash.content:
   description: 'Pages, blog posts and other site content.'
   route_name: system.admin_content
   menu_name: your-dashboards
-  weight: 35
+  weight: 29
   options:
+    mh_dash_group: space
+    mh_hide_with_sidebar: true
     # Facilitators can see the content list (a role permission), but it is not
     # their job; editors and staff carry 'administer media'.
     mh_access_permission: 'administer media'
@@ -142,8 +160,9 @@ makerspace_user_links.dash.newsletter:
   description: 'Weekly digest and monthly newsletter.'
   route_name: makerspace_digest_scheduler.console
   menu_name: your-dashboards
-  weight: 36
+  weight: 27
   options:
+    mh_dash_group: space
     attributes:
       data-icon: envelope-paper
 
@@ -154,8 +173,10 @@ makerspace_user_links.dash.site_admin:
   description: 'Structure, media, configuration and help.'
   route_name: system.admin
   menu_name: your-dashboards
-  weight: 37
+  weight: 30
   options:
+    mh_dash_group: space
+    mh_hide_with_sidebar: true
     mh_access_permission: 'administer media'
     attributes:
       data-icon: sliders
@@ -168,8 +189,9 @@ makerspace_user_links.dash.programs:
   description: 'GEMS, Foundations, Pathway to Trades: runs, cohorts and pending badges.'
   route_name: makerspace_programs_dashboard.overview
   menu_name: your-dashboards
-  weight: 11
+  weight: 22
   options:
+    mh_dash_group: space
     attributes:
       data-icon: diagram-3
 
@@ -178,8 +200,9 @@ makerspace_user_links.dash.workshops:
   description: 'Upcoming runs to fill, the workshop catalog and meetups.'
   route_name: makerspace_workshops_dashboard.overview
   menu_name: your-dashboards
-  weight: 12
+  weight: 23
   options:
+    mh_dash_group: space
     attributes:
       data-icon: easel
 
@@ -188,8 +211,9 @@ makerspace_user_links.dash.badger:
   description: 'Badge requests waiting for you and your confirmed sessions.'
   route_name: appointment_on_request.badger_dashboard
   menu_name: your-dashboards
-  weight: 21
+  weight: 4
   options:
+    mh_dash_group: mine
     attributes:
       data-icon: patch-check
 
@@ -198,8 +222,9 @@ makerspace_user_links.dash.member_success:
   description: 'Onboarding, engagement and retention queues.'
   route_name: makerspace_member_success.dashboard
   menu_name: your-dashboards
-  weight: 31
+  weight: 21
   options:
+    mh_dash_group: space
     attributes:
       data-icon: people
 

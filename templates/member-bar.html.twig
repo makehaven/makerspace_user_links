@@ -44,7 +44,12 @@
         <details id="mh-dashboards" class="mh-member-bar__drop mh-member-bar__dashboards">
           <summary title="{{ 'Your dashboards'|t }}"><span class="bi bi-speedometer2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Dashboards'|t }}</span><span class="bi bi-chevron-down mh-member-bar__caret" aria-hidden="true"></span></summary>
           <ul class="mh-member-bar__panel mh-member-bar__list">
+            {% set groups = dashboards|column('group') %}
+            {% set grouped = 'mine' in groups and 'space' in groups %}
             {% for link in dashboards %}
+              {% if grouped and (loop.first or link.group != dashboards[loop.index0 - 1].group) %}
+                <li class="mh-member-bar__group" role="presentation">{{ link.group == 'mine' ? 'Mine'|t : 'Running the space'|t }}</li>
+              {% endif %}
               <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
                 {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}
                 <span class="mh-member-bar__item-text">{{ link.title }}{% if link.description %}<small>{{ link.description }}</small>{% endif %}</span></a></li>

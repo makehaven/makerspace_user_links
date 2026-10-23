@@ -242,6 +242,9 @@ class MemberBar implements TrustedCallbackInterface {
       if ($callback && is_callable($callback) && !$callback($this->currentUser)) {
         continue;
       }
+      if (!empty($options['mh_hide_with_sidebar']) && $this->currentUser->hasPermission('access navigation')) {
+        continue;
+      }
       $url = $link->getUrlObject();
       $nolink = $url->isRouted() && $url->getRouteName() === '<nolink>';
       try {
@@ -268,6 +271,7 @@ class MemberBar implements TrustedCallbackInterface {
         'icon' => preg_replace('/[^a-z0-9-]/', '', (string) ($options['attributes']['data-icon'] ?? '')),
         'active' => $active,
         'children' => $children,
+        'group' => $options['mh_dash_group'] ?? 'space',
       ];
     }
     return $links;
