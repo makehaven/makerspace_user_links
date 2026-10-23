@@ -70,7 +70,7 @@ makerspace_user_links.dash.library_manager:
   description: 'Loans, overdue tools, fees and batteries.'
   route_name: lending_library.dashboard
   menu_name: your-dashboards
-  weight: 24
+  weight: 25
   options:
     mh_dash_group: space
     attributes:
@@ -205,6 +205,17 @@ makerspace_user_links.dash.workshops:
     mh_dash_group: space
     attributes:
       data-icon: easel
+
+makerspace_user_links.dash.education_console:
+  title: 'Education Console'
+  description: 'Instructor pipeline: proposals, interest, workshop ideas and agreements.'
+  route_name: instructor_companion.education_console
+  menu_name: your-dashboards
+  weight: 24
+  options:
+    mh_dash_group: space
+    attributes:
+      data-icon: clipboard-check
 
 makerspace_user_links.dash.badger:
   title: 'Badger dashboard'
