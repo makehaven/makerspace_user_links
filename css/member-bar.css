@@ -319,8 +319,36 @@
   white-space: nowrap;
 }
 
+/* Dashboards keeps its word when the other labels go: a bare gauge icon is
+   not findable, and the staff sidebar points here by name (2026-10-23). */
+.mh-member-bar.is-compact .mh-member-bar__dashboards .mh-member-bar__label {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+}
+
 .mh-member-bar.is-crowded .mh-member-bar__logo {
   display: none;
+}
+
+/* "Show me": a link to #mh-dashboards opens the menu and rings the button. */
+.mh-member-bar__dashboards.is-pointed > summary {
+  animation: mh-member-bar-point 0.9s ease-in-out 3;
+  box-shadow: 0 0 0 3px var(--mhb-gold);
+}
+
+@keyframes mh-member-bar-point {
+  50% {
+    box-shadow: 0 0 0 7px var(--mhb-gold);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mh-member-bar__dashboards.is-pointed > summary {
+    animation: none;
+  }
 }
 
 @container mhbar (max-width: 760px) {

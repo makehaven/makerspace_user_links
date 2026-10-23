@@ -9,6 +9,8 @@
  *   measures itself and sheds width in steps until nothing touches the
  *   centred wordmark: `is-tight` turns the search input into an icon,
  *   `is-compact` drops the labels, `is-crowded` drops the wordmark.
+ * - "Show me": a link to #mh-dashboards (the staff sidebar has one) opens the
+ *   Dashboards menu and rings its button, so people see where it lives.
  */
 (function (Drupal, once) {
   Drupal.behaviors.mhMemberBar = {
@@ -69,6 +71,29 @@
         }
         if (document.fonts && document.fonts.ready) {
           document.fonts.ready.then(fit);
+        }
+        const dashboards = bar.querySelector('#mh-dashboards');
+        const pointAt = () => {
+          dashboards.open = true;
+          dashboards.querySelector('summary').focus();
+          dashboards.classList.remove('is-pointed');
+          // Reflow so the ring restarts on a second click.
+          void dashboards.offsetWidth;
+          dashboards.classList.add('is-pointed');
+          setTimeout(() => dashboards.classList.remove('is-pointed'), 4000);
+        };
+        if (dashboards) {
+          document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href$="#mh-dashboards"]');
+            if (link) {
+              e.preventDefault();
+              // Let the outside-click handler close other menus first.
+              setTimeout(pointAt, 0);
+            }
+          });
+          if (window.location.hash === '#mh-dashboards') {
+            pointAt();
+          }
         }
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') {
