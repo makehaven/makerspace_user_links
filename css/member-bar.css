@@ -278,6 +278,12 @@
   overscroll-behavior: contain;
 }
 
+/* Dashboards is the long list (a manager's runs to ~16 entries, each with a
+   description): wide enough that most descriptions fit on one line. */
+.mh-member-bar__dashboards .mh-member-bar__panel {
+  width: 24rem;
+}
+
 .mh-member-bar__panel a {
   display: flex;
   align-items: flex-start;
@@ -374,6 +380,7 @@
   .mh-member-bar__panel {
     left: 0.5rem;
     right: 0.5rem;
+    width: auto;
     top: calc(100% + 0.25rem);
   }
 
