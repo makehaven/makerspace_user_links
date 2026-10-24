@@ -36,3 +36,12 @@ services:
   logger.channel.makerspace_user_links:
     parent: logger.channel_base
     arguments: ['makerspace_user_links']
+
+  makerspace_user_links.member_hub_login_redirect:
+    class: Drupal\makerspace_user_links\EventSubscriber\MemberHubLoginRedirect
+    arguments:
+      - '@current_user'
+      - '@path_alias.manager'
+      - '@messenger'
+    tags:
+      - { name: event_subscriber }
