@@ -662,6 +662,17 @@ makerspace_user_links.make.harassment:
     attributes:
       data-icon: shield-exclamation
 
+makerspace_user_links.make.mess:
+  title: 'Report a mess'
+  description: 'A tool or area left dirty or messy.'
+  url: 'internal:/form/webform-28014'
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_safety
+  weight: 15
+  options:
+    attributes:
+      data-icon: trash
+
 makerspace_user_links.make.feedback:
   title: 'Feedback to staff'
   description: 'Ideas, complaints and suggestions.'
