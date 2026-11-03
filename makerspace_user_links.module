@@ -61,6 +61,7 @@ function makerspace_user_links_theme(): array {
         'dashboards' => [],
         'account' => [],
         'display_name' => '',
+        'first_name' => '',
         'membership_url' => '',
         'membership_active' => FALSE,
       ],
@@ -70,6 +71,9 @@ function makerspace_user_links_theme(): array {
       'variables' => [
         'home_url' => '',
         'account' => [],
+        'display_name' => '',
+        'first_name' => '',
+        'membership_url' => '',
       ],
       'template' => 'member-return',
     ],

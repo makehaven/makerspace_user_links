@@ -372,7 +372,64 @@
   }
 }
 
+/* The name menu exists for phones only; desktop keeps separate buttons
+   (no account dropdown there, JR 2026-10-06). */
+.mh-member-bar__me-menu {
+  display: none;
+}
+
 @container mhbar (max-width: 760px) {
+  /* Phones: the name, Public Website and Log out fold into one menu under
+     the member's first name, so the bar says who is signed in and every
+     remaining control is recognisable (2026-11-03). Switch back stays out
+     in the open while masquerading. */
+  .mh-member-bar__me-menu {
+    display: block;
+  }
+
+  .mh-member-bar__me-menu > summary {
+    max-width: 9rem;
+  }
+
+  .mh-member-bar__first {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  .mh-member-bar .mh-member-bar__end > .mh-member-bar__site,
+  .mh-member-bar .mh-member-bar__end > .mh-member-bar__me,
+  .mh-member-bar .mh-member-bar__end > .mh-member-bar__logout {
+    display: none;
+  }
+
+  /* Like Dashboards: the panel spans the bar rather than hanging off the
+     button, so it never pushes past the screen edge. */
+  .mh-member-bar .mh-member-bar__me-menu {
+    position: static;
+  }
+
+  .mh-member-bar__me-panel {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+  }
+
+  .mh-member-bar__me-panel a {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .mh-member-bar__signed-in {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8125rem;
+    color: var(--mh-color-neutral-600, #5c5f66);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
   .mh-member-bar__logo,
   .mh-member-bar__primary,
   .mh-member-bar__name,

@@ -13,6 +13,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\user\Entity\User;
 
 /**
  * Builds the logged-in member bar shown at the top of every member page.
@@ -117,25 +118,28 @@ class MemberBar implements TrustedCallbackInterface {
   /**
    * Lazy builder: the public theme's way back to the member side.
    *
-   * One gold button, plus "Switch back" while staff masquerade (the bar that
-   * used to carry it no longer renders on public pages).
+   * The gold button, who is signed in, and Log out (plus "Switch back" while
+   * staff masquerade). Members on phones could not tell they were signed in
+   * on public pages, and the only Log out was an unlabelled icon on member
+   * pages (facilitators and members, 2026-11-03): visitors see "Join | Log
+   * in" in this strip, so members now see "Member Resources | Log out".
    */
   public function buildPublicReturn(): array {
     $cache = [
-      'contexts' => ['user.permissions', 'session.is_masquerading'],
-      'tags' => ['config:system.menu.member-account'],
+      'contexts' => ['user', 'session.is_masquerading'],
+      'tags' => ['config:system.menu.member-account', 'user:' . $this->currentUser->id()],
     ];
     if (!self::shows($this->currentUser)) {
       return ['#cache' => $cache];
     }
-    $switch_back = array_values(array_filter(
-      $this->links('member-account'),
-      static fn(array $link): bool => str_contains($link['url'], 'unmasquerade'),
-    ));
+    [$full, $first] = $this->names();
     return [
       '#theme' => 'makerspace_user_links_member_return',
       '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => self::HUB_NID])->toString(),
-      '#account' => $switch_back,
+      '#account' => $this->links('member-account'),
+      '#display_name' => $full,
+      '#first_name' => $first,
+      '#membership_url' => Url::fromRoute('entity.node.canonical', ['node' => 5737])->toString(),
       '#attached' => ['library' => ['makerspace_user_links/member_return']],
       '#cache' => $cache,
     ];
@@ -158,6 +162,8 @@ class MemberBar implements TrustedCallbackInterface {
     }
 
     $current = $this->currentPath->getPath();
+    $names = $this->names();
+    $cache['tags'][] = 'user:' . $this->currentUser->id();
 
     $hub_url = Url::fromRoute('entity.node.canonical', ['node' => self::HUB_NID])->toString();
 
@@ -173,7 +179,8 @@ class MemberBar implements TrustedCallbackInterface {
       '#primary' => $this->links('member-nav', $current, FALSE),
       '#dashboards' => $this->links('your-dashboards', $current, FALSE),
       '#account' => $this->links('member-account', $current, FALSE),
-      '#display_name' => $this->currentUser->getDisplayName(),
+      '#display_name' => $names[0],
+      '#first_name' => $names[1],
       // The name opens My Membership (node 5737): profile, login, billing,
       // badges, storage. No account dropdown (JR 2026-10-06).
       '#membership_url' => Url::fromRoute('entity.node.canonical', ['node' => 5737])->toString(),
@@ -181,6 +188,34 @@ class MemberBar implements TrustedCallbackInterface {
       '#attached' => ['library' => ['makerspace_user_links/member_bar']],
       '#cache' => $cache,
     ];
+  }
+
+  /**
+   * The viewer's full and first name.
+   *
+   * First + last name fields when set; otherwise the display name, which for
+   * older accounts is the login email (shown as the part before the @ so a
+   * phone header never carries a whole address).
+   *
+   * @return string[]
+   *   [full name, first name].
+   */
+  public function names(): array {
+    $account = User::load($this->currentUser->id());
+    $first = $last = '';
+    if ($account) {
+      $first = $account->hasField('field_first_name') ? trim((string) $account->get('field_first_name')->value) : '';
+      $last = $account->hasField('field_last_name') ? trim((string) $account->get('field_last_name')->value) : '';
+    }
+    $full = trim($first . ' ' . $last);
+    if ($full === '') {
+      $full = (string) $this->currentUser->getDisplayName();
+      $full = str_contains($full, '@') ? strstr($full, '@', TRUE) : $full;
+    }
+    if ($first === '') {
+      $first = strtok($full, ' ') ?: $full;
+    }
+    return [$full, $first];
   }
 
   /**

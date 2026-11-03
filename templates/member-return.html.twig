@@ -4,12 +4,15 @@
  * The public theme's way back to the member side (see MemberBar).
  *
  * Rendered in the public header's red top strip for logged-in members, in
- * place of the full member bar.
+ * place of the full member bar. Visitors see "Join | Log in" here, so a
+ * member sees who is signed in and "Member Resources | Log out".
  *
  * Available variables:
  * - home_url: Member Resources (node 619).
- * - account: { title, url, icon } links; only "Switch back" while
+ * - account: { title, url, icon } links: Log out, and Switch back while
  *   masquerading.
+ * - display_name, first_name: the viewer's name.
+ * - membership_url: My Membership (node 5737).
  */
 #}
 <div class="mh-member-return">
@@ -17,8 +20,13 @@
     <span class="bi bi-grid-3x3-gap-fill" aria-hidden="true"></span>{{ 'Member Resources'|t }}
   </a>
   {% for link in account %}
-    <a class="mh-member-return__action" href="{{ link.url }}">
+    <a class="mh-member-return__action{{ 'logout' in link.url ? ' mh-member-return__logout' }}" href="{{ link.url }}">
       {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}{{ link.title }}
     </a>
   {% endfor %}
+  {% if first_name %}
+    <span class="mh-member-return__who">
+      {{ 'Signed in as'|t }} <a href="{{ membership_url }}" title="{{ display_name }}: {{ 'My Membership'|t }}">{{ first_name }}</a>
+    </span>
+  {% endif %}
 </div>

@@ -52,6 +52,41 @@
   outline-offset: 2px;
 }
 
+/* Log out mirrors the visitor's "Log in" pill: outlined, not gold. */
+.mh-member-return .mh-member-return__logout {
+  background: transparent;
+  color: var(--mh-color-surface, #fff);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.mh-member-return {
+  flex-wrap: wrap;
+}
+
+/* "Signed in as Jamie": small and quiet, white on the red strip. */
+.mh-member-return__who {
+  font-size: 0.8125rem;
+  color: var(--mh-color-surface, #fff);
+  white-space: nowrap;
+}
+
+.mh-member-return .mh-member-return__who a {
+  display: inline;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  background: none;
+}
+
+.mh-member-return .mh-member-return__who a:hover,
+.mh-member-return .mh-member-return__who a:focus-visible {
+  background: none;
+  color: inherit;
+}
+
 @media print {
   .mh-member-return {
     display: none;

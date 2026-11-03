@@ -13,6 +13,9 @@
  *   usually empty) sit beside Member Resources; dashboards are the viewer's
  *   role dashboards, already access-filtered.
  * - display_name: the viewer's name; links to My Membership.
+ * - first_name: shown on phones, where the name, Public Website and the
+ *   account actions fold into one name menu (JR 2026-11-03: members could
+ *   not tell they were signed in or find Log out among unlabelled icons).
  * - membership_url, membership_active: My Membership (node 5737).
  * - account: action buttons beside the name (switch back, log out).
  */
@@ -77,10 +80,26 @@
       </a>
 
       {% for link in account %}
-        <a class="mh-member-bar__action" href="{{ link.url }}" title="{{ link.title }}">
+        <a class="mh-member-bar__action{{ 'logout' in link.url ? ' mh-member-bar__logout' }}" href="{{ link.url }}" title="{{ link.title }}">
           {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span class="mh-member-bar__action-label">{{ link.title }}</span>
         </a>
       {% endfor %}
+
+      {# Phones only: who is signed in, with My Membership, Public Website and
+         Log out behind the name. Desktop keeps the separate buttons above. #}
+      <details class="mh-member-bar__drop mh-member-bar__me-menu">
+        <summary title="{{ 'Signed in as @name'|t({'@name': display_name}) }}">
+          <span class="bi bi-person-circle" aria-hidden="true"></span><span class="mh-member-bar__first">{{ first_name ?: display_name }}</span><span class="bi bi-chevron-down" aria-hidden="true"></span>
+        </summary>
+        <ul class="mh-member-bar__panel mh-member-bar__me-panel">
+          <li class="mh-member-bar__signed-in" role="presentation">{{ 'Signed in as'|t }} <strong>{{ display_name }}</strong></li>
+          <li><a href="{{ membership_url }}"{{ membership_active ? ' aria-current="page"' }}><span class="bi bi-person-circle" aria-hidden="true"></span><span>{{ 'My Membership'|t }}</span></a></li>
+          <li><a href="{{ site_url }}"><span class="bi bi-globe2" aria-hidden="true"></span><span>{{ 'Public Website'|t }}</span></a></li>
+          {% for link in account %}
+            <li><a href="{{ link.url }}">{% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}<span>{{ link.title }}</span></a></li>
+          {% endfor %}
+        </ul>
+      </details>
     </div>
   </div>
 </nav>
