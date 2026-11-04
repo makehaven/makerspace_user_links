@@ -481,6 +481,40 @@ function makerspace_user_links_user_view(array &$build, UserInterface $account, 
 }
 
 /**
+ * Implements hook_entity_field_access().
+ *
+ * Members may ADD a profile photo when they have none (skipped it at signup),
+ * but may not CHANGE one: the photo is how staff recognise people at the door,
+ * and some members had replaced theirs with pets (JR, 2026-10-29 / 11-03).
+ * Staff check a newly added photo against ID at orientation, when the card is
+ * printed. The member role holds "create" and "edit own field_member_photo"
+ * for the first half; this takes edit away again once a photo is saved.
+ *
+ * "Saved" is read from the database, not from the entity: after an upload the
+ * form rebuilds with the new file already on the entity, and judging by that
+ * would hide the widget the member is using.
+ */
+function makerspace_user_links_entity_field_access(string $operation, $field_definition, AccountInterface $account, $items = NULL): AccessResultInterface {
+  if ($operation !== 'edit' || $field_definition->getName() !== 'field_member_photo' || $items === NULL) {
+    return AccessResult::neutral();
+  }
+  $profile = $items->getEntity();
+  if ($profile->getEntityTypeId() !== 'profile' || $profile->bundle() !== 'main') {
+    return AccessResult::neutral();
+  }
+  // Staff (any-profile edit) and members not yet approved keep the field.
+  if ($account->hasPermission('edit field_member_photo') || in_array('member_pending_approval', $account->getRoles(), TRUE)) {
+    return AccessResult::neutral()->cachePerPermissions();
+  }
+  $saved = !$profile->isNew() && (bool) \Drupal::database()
+    ->query('SELECT 1 FROM {profile__field_member_photo} WHERE entity_id = :id AND deleted = 0 LIMIT 1', [':id' => $profile->id()])
+    ->fetchField();
+  return AccessResult::forbiddenIf($saved, 'Member photo already set; staff change it')
+    ->cachePerPermissions()
+    ->addCacheableDependency($profile);
+}
+
+/**
  * Implements hook_ENTITY_TYPE_access() for profile.
  *
  * A main profile follows the same Public / Members Only rule as its owner's
@@ -552,6 +586,8 @@ function makerspace_user_links_form_user_form_alter(array &$form, FormStateInter
     return;
   }
   $own = (int) $account->id() === (int) \Drupal::currentUser()->id();
+  $profile = $own ? \Drupal::entityTypeManager()->getStorage('profile')->loadByUser($account, 'main') : NULL;
+  $no_photo = $own && (!$profile || ($profile->hasField('field_member_photo') && $profile->get('field_member_photo')->isEmpty()));
   $form['makerspace_member_profile_pointer'] = [
     '#type' => 'html_tag',
     '#tag' => 'p',
@@ -559,13 +595,15 @@ function makerspace_user_links_form_user_form_alter(array &$form, FormStateInter
     '#attributes' => ['class' => ['mh-member-profile-pointer']],
     'text' => [
       '#markup' => $own
-        ? t('Looking for your profile photo, bio or interests? They are on your member profile.')
+        ? ($no_photo
+          ? t('You have no profile photo yet. Add one on your member profile; staff will check it against your ID at orientation.')
+          : t('Looking for your bio or interests? They are on your member profile. To change your photo, ask staff.'))
         : t('Profile photo, bio and interests are on the member profile.'),
       '#suffix' => ' ',
     ],
     'link' => [
       '#type' => 'link',
-      '#title' => $own ? t('Edit your member profile') : t('Edit member profile'),
+      '#title' => $own ? ($no_photo ? t('Add your photo') : t('Edit your member profile')) : t('Edit member profile'),
       '#url' => $url,
     ],
   ];
