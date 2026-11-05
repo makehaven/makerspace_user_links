@@ -540,6 +540,17 @@ makerspace_user_links.make.printing:
     attributes:
       data-icon: printer
 
+makerspace_user_links.make.print_org:
+  title: 'Print for MakeHaven work'
+  description: 'Staff, instructor and contractor printing under your own name, with no balance needed.'
+  route_name: savapage_auth.launch_org
+  menu_name: journey-make
+  parent: makerspace_user_links.make.group_materials
+  weight: 11
+  options:
+    attributes:
+      data-icon: printer
+
 makerspace_user_links.make.print_manager:
   title: 'Print manager'
   description: 'Release and manage your print jobs.'
