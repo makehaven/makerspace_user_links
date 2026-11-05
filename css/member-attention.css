@@ -77,6 +77,12 @@
 @media (max-width: 575px) {
   .mh-attention__item {
     flex-wrap: wrap;
+    padding: 0.7rem 0.9rem;
+  }
+  /* Icon and message share the first row; the button wraps under the message. */
+  .mh-attention__message {
+    flex: 1 1 calc(100% - 2.2rem);
+    min-width: 0;
   }
   .mh-attention__action {
     margin-left: 2.15rem;
