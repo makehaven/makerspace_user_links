@@ -542,8 +542,8 @@ makerspace_user_links.make.printing:
 
 makerspace_user_links.make.print_org:
   title: 'Print for MakeHaven work'
-  description: 'Staff, instructor and contractor printing under your own name, with no balance needed.'
-  route_name: savapage_auth.launch_org
+  description: 'Free printing for staff, instructors and contractors. Copies are kept for review.'
+  route_name: savapage_auth.org_notice
   menu_name: journey-make
   parent: makerspace_user_links.make.group_materials
   weight: 11
