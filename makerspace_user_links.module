@@ -428,7 +428,7 @@ function makerspace_user_links_node_view(array &$build, NodeInterface $node, Ent
     '#type' => 'html_tag',
     '#tag' => 'div',
     '#attributes' => ['class' => ['alert', 'alert-info', 'mh-pending-notice'], 'role' => 'status'],
-    '#value' => t('Your membership will be verified by a staff member soon. This page opens up once that is done. Questions? Email <a href=":mail">membership@makehaven.org</a>.', [':mail' => 'mailto:membership@makehaven.org']),
+    '#value' => t('Your membership will be verified by a staff member soon. This page opens up once that is done. Questions? Email <a href=":mail">member-care@makehaven.org</a>.', [':mail' => 'mailto:member-care@makehaven.org']),
     '#weight' => -100,
   ];
 }
