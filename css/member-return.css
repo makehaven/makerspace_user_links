@@ -87,6 +87,155 @@
   color: inherit;
 }
 
+/* Dashboards: the member bar's menu, offered here too so role dashboards are
+   one click away on public pages (staff, 2026-11-10). A gold pill like
+   Member Resources; the list drops below it. */
+.mh-member-return__dashboards {
+  position: relative;
+}
+
+.mh-member-return__dashboards > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--mh-radius-pill, 999px);
+  background: var(--mh-color-accent-gold, #ffc658);
+  color: var(--mh-color-neutral-900, #1e1f24);
+  font-family: var(--mh-font-sans, "Montserrat", "Roboto", "Helvetica Neue", Arial, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mh-member-return__dashboards > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mh-member-return__dashboards > summary:hover,
+.mh-member-return__dashboards > summary:focus-visible,
+.mh-member-return__dashboards[open] > summary {
+  background: var(--mh-color-surface, #fff);
+}
+
+.mh-member-return__dashboards > summary:focus-visible {
+  outline: 2px solid var(--mh-color-surface, #fff);
+  outline-offset: 2px;
+}
+
+.mh-member-return__caret {
+  font-size: 0.7rem;
+  transition: transform 0.15s ease;
+}
+
+.mh-member-return__dashboards[open] .mh-member-return__caret {
+  transform: rotate(180deg);
+}
+
+.mh-member-return__panel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  z-index: 1050;
+  width: 24rem;
+  max-width: calc(100vw - 1rem);
+  max-height: calc(100vh - 4.5rem);
+  max-height: calc(100dvh - 4.5rem);
+  margin: 0;
+  padding: 0.35rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  border: 1px solid var(--mh-color-neutral-300, #d9d9de);
+  border-radius: var(--mh-radius-md, 0.5rem);
+  background: var(--mh-color-surface, #fff);
+  box-shadow: var(--mh-shadow-md, 0 6px 20px rgb(19 19 20 / 0.12));
+  text-align: left;
+}
+
+.mh-member-return .mh-member-return__panel a {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--mh-radius-sm, 0.375rem);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: normal;
+  color: var(--mh-color-neutral-900, #1e1f24);
+  background: none;
+}
+
+.mh-member-return .mh-member-return__panel a:hover,
+.mh-member-return .mh-member-return__panel a:focus-visible {
+  background: var(--mh-color-neutral-100, #f2f2f4);
+  outline: none;
+}
+
+.mh-member-return__panel .bi {
+  color: var(--mh-color-brand-primary, #8b1919);
+}
+
+.mh-member-return__item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.mh-member-return__item-text small {
+  color: var(--mh-color-neutral-600, #616161);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.mh-member-return__group {
+  padding: 0.5rem 0.6rem 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mh-color-neutral-600, #5c5f66);
+}
+
+.mh-member-return__group:not(:first-child) {
+  margin-top: 0.35rem;
+  border-top: 1px solid var(--mh-color-neutral-300, #d9d9de);
+  padding-top: 0.6rem;
+}
+
+/* Phones: the list spans the screen, titles only, two to a row. */
+@media (max-width: 600px) {
+  .mh-member-return,
+  .mh-member-return__dashboards {
+    position: static;
+  }
+
+  #navbar-top:has(.mh-member-return) {
+    position: relative;
+  }
+
+  .mh-member-return__panel {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: 100%;
+    width: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.125rem;
+  }
+
+  .mh-member-return__group {
+    grid-column: 1 / -1;
+  }
+
+  .mh-member-return__item-text small {
+    display: none;
+  }
+}
+
 @media print {
   .mh-member-return {
     display: none;

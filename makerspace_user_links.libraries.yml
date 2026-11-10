@@ -43,11 +43,15 @@ member_bar:
     - makerspace_user_links/bootstrap_icons
 
 member_return:
-  version: '1.0'
+  version: '1.1'
   css:
     theme:
       css/member-return.css: {}
+  js:
+    js/member-return.js: {}
   dependencies:
+    - core/drupal
+    - core/once
     - makerspace_user_links/bootstrap_icons
 
 member_index:

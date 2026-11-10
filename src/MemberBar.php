@@ -25,10 +25,10 @@ use Drupal\user\Entity\User;
  * members see (JR 2026-10-14; dark launch to manager first). See shows().
  *
  * The bar renders in the member (Gin) theme only. The public site already has
- * its own header, navigation and search, so there a logged-in member gets just
- * a gold "Member Resources" button in the header's red top strip
- * (buildPublicReturn()) instead of a second bar and a second search box
- * (JR 2026-10-13).
+ * its own header, navigation and search, so there a logged-in member gets a
+ * gold "Member Resources" button and the Dashboards menu in the header's red
+ * top strip (buildPublicReturn()) instead of a second bar and a second search
+ * box (JR 2026-10-13; Dashboards added 2026-11-10).
  *
  * Its links come from three menus so staff can reorder or disable them
  * without code:
@@ -118,7 +118,7 @@ class MemberBar implements TrustedCallbackInterface {
   /**
    * Lazy builder: the public theme's way back to the member side.
    *
-   * The gold button, who is signed in, and Log out (plus "Switch back" while
+   * The gold button, the Dashboards menu, who is signed in, and Log out (plus "Switch back" while
    * staff masquerade). Members on phones could not tell they were signed in
    * on public pages, and the only Log out was an unlabelled icon on member
    * pages (facilitators and members, 2026-11-03): visitors see "Join | Log
@@ -127,7 +127,11 @@ class MemberBar implements TrustedCallbackInterface {
   public function buildPublicReturn(): array {
     $cache = [
       'contexts' => ['user', 'session.is_masquerading'],
-      'tags' => ['config:system.menu.member-account', 'user:' . $this->currentUser->id()],
+      'tags' => [
+        'config:system.menu.member-account',
+        'config:system.menu.your-dashboards',
+        'user:' . $this->currentUser->id(),
+      ],
     ];
     if (!self::shows($this->currentUser)) {
       return ['#cache' => $cache];
@@ -136,6 +140,10 @@ class MemberBar implements TrustedCallbackInterface {
     return [
       '#theme' => 'makerspace_user_links_member_return',
       '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => self::HUB_NID])->toString(),
+      // The same Dashboards menu the member bar carries: without it a
+      // facilitator or instructor on a public page saw no dashboards at all
+      // and had to know to open Member Resources first (staff, 2026-11-10).
+      '#dashboards' => $this->links('your-dashboards', '', FALSE),
       '#account' => $this->links('member-account'),
       '#display_name' => $full,
       '#first_name' => $first,

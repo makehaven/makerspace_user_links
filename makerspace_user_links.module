@@ -70,6 +70,7 @@ function makerspace_user_links_theme(): array {
     'makerspace_user_links_member_return' => [
       'variables' => [
         'home_url' => '',
+        'dashboards' => [],
         'account' => [],
         'display_name' => '',
         'first_name' => '',
@@ -103,8 +104,8 @@ function makerspace_user_links_page_top(array &$page_top): void {
 /**
  * Implements hook_preprocess_HOOK() for page.
  *
- * On the public theme a logged-in member gets one gold "Member Resources"
- * button in the header's red top strip, beside the site search (where
+ * On the public theme a logged-in member gets a gold "Member Resources"
+ * button and their Dashboards menu in the header's red top strip, beside the site search (where
  * visitors see Log in), rather than the whole member bar: public pages keep
  * a single navigation bar and a single search box (JR 2026-10-13).
  */
