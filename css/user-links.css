@@ -40,3 +40,11 @@
   font-style: italic;
   color: #7b7b7b;
 }
+
+/* Dark mode (theme toggle sets html[data-bs-theme="dark"]): the greys above
+   fell to 2.5:1 on the dark sidebar card (feedback 21060, 2026-11). */
+[data-bs-theme="dark"] .makerspace-user-links__group-label,
+[data-bs-theme="dark"] .makerspace-user-links__item-description,
+[data-bs-theme="dark"] .makerspace-user-links__empty {
+  color: rgba(255, 255, 255, .7);
+}
