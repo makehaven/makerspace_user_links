@@ -11,6 +11,12 @@
 # been self-links on those pages); the launcher row below is the single entry
 # point to each dashboard.
 #
+# Naming (JR 2026-11-17): a Dashboard is a page you look at (numbers,
+# status); a Console is where you work (queues, actions, settings for one
+# job); Staff Tools is the index of every staff page. Personal volunteer
+# pages (Instructor, Facilitator, Badger Dashboard) keep their names: emails
+# and guides already use them.
+#
 # The bar's Dashboards menu splits into "Mine" (mh_dash_group: mine — your own
 # work) and "Running the space" (everything else) when a person has both, so
 # the long staff list leads with what is theirs (2026-10-23).
@@ -66,11 +72,11 @@ makerspace_user_links.dash.borrowed:
       data-icon: box-seam
 
 makerspace_user_links.dash.library_manager:
-  title: 'Library manager'
+  title: 'Library Console'
   description: 'Loans, overdue tools, fees and batteries.'
   route_name: lending_library.dashboard
   menu_name: your-dashboards
-  weight: 25
+  weight: 24
   options:
     mh_dash_group: space
     attributes:
@@ -96,7 +102,7 @@ makerspace_user_links.dash.civicrm:
   description: 'Contacts, contributions, events, and mailings.'
   url: 'internal:/civicrm'
   menu_name: your-dashboards
-  weight: 28
+  weight: 29
   options:
     mh_dash_group: space
     mh_access_permission: 'access CiviCRM'
@@ -145,7 +151,7 @@ makerspace_user_links.dash.content:
   description: 'Pages, blog posts and other site content.'
   route_name: system.admin_content
   menu_name: your-dashboards
-  weight: 29
+  weight: 30
   options:
     mh_dash_group: space
     mh_hide_with_sidebar: true
@@ -156,11 +162,11 @@ makerspace_user_links.dash.content:
       data-icon: file-earmark-text
 
 makerspace_user_links.dash.newsletter:
-  title: 'Newsletter console'
+  title: 'Newsletter Console'
   description: 'Weekly digest and monthly newsletter.'
   route_name: makerspace_digest_scheduler.console
   menu_name: your-dashboards
-  weight: 27
+  weight: 23
   options:
     mh_dash_group: space
     attributes:
@@ -173,7 +179,7 @@ makerspace_user_links.dash.site_admin:
   description: 'Structure, media, configuration and help.'
   route_name: system.admin
   menu_name: your-dashboards
-  weight: 30
+  weight: 31
   options:
     mh_dash_group: space
     mh_hide_with_sidebar: true
@@ -185,22 +191,22 @@ makerspace_user_links.dash.site_admin:
 # route's own permission gates it: programs/workshops (event_management,
 # manager), badger (facilitator), member success (data, manager, special).
 makerspace_user_links.dash.programs:
-  title: 'Programs'
+  title: 'Programs Dashboard'
   description: 'GEMS, Foundations, Pathway to Trades: runs, cohorts and pending badges.'
   route_name: makerspace_programs_dashboard.overview
   menu_name: your-dashboards
-  weight: 22
+  weight: 27
   options:
     mh_dash_group: space
     attributes:
       data-icon: diagram-3
 
 makerspace_user_links.dash.workshops:
-  title: 'Workshops & meetups'
-  description: 'Upcoming runs to fill, the workshop catalog and meetups.'
+  title: 'Course History'
+  description: 'Every workshop with all its runs, fill and revenue; meetups too.'
   route_name: makerspace_workshops_dashboard.overview
   menu_name: your-dashboards
-  weight: 23
+  weight: 28
   options:
     mh_dash_group: space
     attributes:
@@ -211,14 +217,14 @@ makerspace_user_links.dash.education_console:
   description: 'Instructor pipeline: proposals, interest, workshop ideas and agreements.'
   route_name: instructor_companion.education_console
   menu_name: your-dashboards
-  weight: 24
+  weight: 21
   options:
     mh_dash_group: space
     attributes:
       data-icon: clipboard-check
 
 makerspace_user_links.dash.badger:
-  title: 'Badger dashboard'
+  title: 'Badger Dashboard'
   description: 'Badge requests waiting for you and your confirmed sessions.'
   route_name: appointment_on_request.badger_dashboard
   menu_name: your-dashboards
@@ -229,11 +235,11 @@ makerspace_user_links.dash.badger:
       data-icon: patch-check
 
 makerspace_user_links.dash.member_success:
-  title: 'Member success'
+  title: 'Member Success Console'
   description: 'Onboarding, engagement and retention queues.'
   route_name: makerspace_member_success.dashboard
   menu_name: your-dashboards
-  weight: 21
+  weight: 22
   options:
     mh_dash_group: space
     attributes:
@@ -1129,13 +1135,27 @@ makerspace_user_links.grow.teach_paid:
 # everyone; mh_access_permission limits the card to people who can use it.
 # Added 2026-11-17: the site had no link to it (Lior asked where voicemail goes).
 makerspace_user_links.dash.voicemail:
-  title: 'Voicemail & missed calls'
+  title: 'Voicemail Console'
   description: 'Messages with transcripts, callers who hung up, and call-backs.'
   url: 'https://voice.makehaven.org'
   menu_name: your-dashboards
-  weight: 26
+  weight: 25
   options:
     mh_dash_group: space
     mh_access_permission: 'access voicemail dashboard'
     attributes:
       data-icon: telephone
+
+# KPI dashboard: public (view makerspace dashboard is granted to anonymous),
+# so the card is limited to staff to keep members' cards short.
+makerspace_user_links.dash.kpi:
+  title: 'KPI Dashboard'
+  description: 'Membership, money, education and operations numbers over time.'
+  route_name: makerspace_dashboard.dashboard
+  menu_name: your-dashboards
+  weight: 26
+  options:
+    mh_dash_group: space
+    mh_access_permission: 'access staff tools dashboard'
+    attributes:
+      data-icon: graph-up
