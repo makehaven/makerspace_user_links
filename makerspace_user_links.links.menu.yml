@@ -17,8 +17,8 @@
 # mh_hide_with_sidebar drops a link for people who already have it in the
 # Navigation sidebar (Content, Administration).
 makerspace_user_links.dash.staff_tools:
-  title: 'Staff Tools Dashboard'
-  description: 'All staff reports, queues, and operational tools in one organized place.'
+  title: 'Staff Tools'
+  description: 'The index of every staff page: reports, queues, settings and outside systems.'
   route_name: makerspace_staff_tools.dashboard
   menu_name: your-dashboards
   weight: 20
@@ -1124,3 +1124,18 @@ makerspace_user_links.grow.teach_paid:
   options:
     attributes:
       data-icon: mortarboard
+
+# The voicemail tool is a separate app, so the route access check passes for
+# everyone; mh_access_permission limits the card to people who can use it.
+# Added 2026-11-17: the site had no link to it (Lior asked where voicemail goes).
+makerspace_user_links.dash.voicemail:
+  title: 'Voicemail & missed calls'
+  description: 'Messages with transcripts, callers who hung up, and call-backs.'
+  url: 'https://voice.makehaven.org'
+  menu_name: your-dashboards
+  weight: 26
+  options:
+    mh_dash_group: space
+    mh_access_permission: 'access voicemail dashboard'
+    attributes:
+      data-icon: telephone
