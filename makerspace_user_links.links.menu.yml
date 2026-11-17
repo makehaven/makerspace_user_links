@@ -86,7 +86,7 @@ makerspace_user_links.dash.library_manager:
 # business-role holders, staff and members whose goal is selling or a
 # business (GrowAccess), as the Grow journey does.
 makerspace_user_links.dash.business:
-  title: 'Business dashboard'
+  title: 'Business Dashboard'
   description: 'Your business profile, products and ecosystem links.'
   route_name: makerspace_entrepreneur_dashboard.member
   menu_name: your-dashboards
@@ -203,7 +203,7 @@ makerspace_user_links.dash.programs:
 
 makerspace_user_links.dash.workshops:
   title: 'Course History'
-  description: 'Every workshop with all its runs, fill and revenue; meetups too.'
+  description: 'Every workshop with all its runs, fill and revenue.'
   route_name: makerspace_workshops_dashboard.overview
   menu_name: your-dashboards
   weight: 28
@@ -1032,7 +1032,7 @@ makerspace_user_links.grow.group_business:
   weight: 0
 
 makerspace_user_links.grow.dashboard:
-  title: 'Business dashboard'
+  title: 'Business Dashboard'
   description: 'Your business profile, products and coaching.'
   route_name: makerspace_entrepreneur_dashboard.member
   menu_name: journey-grow
