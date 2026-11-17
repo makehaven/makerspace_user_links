@@ -7,11 +7,12 @@
  * - home_url, home_active: Member Resources (node 619), the gold button.
  * - site_url: the public front page ("Public Website").
  * - logo_url: the MakeHaven wordmark, shown centred and not linked.
- * - search_url: where the search box submits (Member Resources, ?q=).
- * - primary, dashboards, account: lists of
- *   { title, description, url, icon, active }. Primary links (member-nav,
- *   usually empty) sit beside Member Resources; dashboards are the viewer's
- *   role dashboards, already access-filtered.
+ * - search_url: where the search box submits (Member Resources, ?q=); the
+ *   phone icon adds #find, which puts the cursor in that page's search.
+ * - primary, account: lists of { title, description, url, icon, active }.
+ *   Primary links (member-nav, usually empty) sit beside Member Resources.
+ *   There is no Dashboards menu: dashboards are cards on Member Resources
+ *   (staff, 2026-11-17: one place, and the bar was too busy).
  * - display_name: the viewer's name; links to My Membership.
  * - first_name: shown on phones, where the name, Public Website and the
  *   account actions fold into one name menu (JR 2026-11-03: members could
@@ -43,30 +44,12 @@
     {% endif %}
 
     <div class="mh-member-bar__end">
-      {% if dashboards %}
-        <details id="mh-dashboards" class="mh-member-bar__drop mh-member-bar__dashboards">
-          <summary title="{{ 'Your dashboards'|t }}"><span class="bi bi-speedometer2" aria-hidden="true"></span><span class="mh-member-bar__label">{{ 'Dashboards'|t }}</span><span class="bi bi-chevron-down mh-member-bar__caret" aria-hidden="true"></span></summary>
-          <ul class="mh-member-bar__panel mh-member-bar__list">
-            {% set groups = dashboards|column('group') %}
-            {% set grouped = 'mine' in groups and 'space' in groups %}
-            {% for link in dashboards %}
-              {% if grouped and (loop.first or link.group != dashboards[loop.index0 - 1].group) %}
-                <li class="mh-member-bar__group" role="presentation">{{ link.group == 'mine' ? 'Mine'|t : 'Running the space'|t }}</li>
-              {% endif %}
-              <li><a href="{{ link.url }}"{{ link.active ? ' aria-current="page"' }}>
-                {% if link.icon %}<span class="bi bi-{{ link.icon }}" aria-hidden="true"></span>{% endif %}
-                <span class="mh-member-bar__item-text">{{ link.title }}{% if link.description %}<small>{{ link.description }}</small>{% endif %}</span></a></li>
-            {% endfor %}
-          </ul>
-        </details>
-      {% endif %}
-
       <form class="mh-member-bar__search" action="{{ search_url }}" method="get" role="search">
         <label class="mh-member-bar__action-label" for="mh-member-bar-q">{{ 'Find a member page'|t }}</label>
         <span class="bi bi-search" aria-hidden="true"></span>
         <input id="mh-member-bar-q" name="q" type="search" placeholder="{{ 'Find anything…'|t }}" autocomplete="off">
       </form>
-      <a class="mh-member-bar__action mh-member-bar__search-link" href="{{ search_url }}" title="{{ 'Find a member page'|t }}">
+      <a class="mh-member-bar__action mh-member-bar__search-link" href="{{ search_url }}#find" title="{{ 'Find a member page'|t }}">
         <span class="bi bi-search" aria-hidden="true"></span><span class="mh-member-bar__action-label">{{ 'Find a member page'|t }}</span>
       </a>
 

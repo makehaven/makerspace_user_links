@@ -4,7 +4,8 @@
  * load the d11 token file, so every token carries its d11 value as fallback.
  *
  * Layout: Member Resources (gold) at the start, the MakeHaven wordmark
- * centred, dashboards / search / Public Website / name / log out at the end.
+ * centred, search / Public Website / name / log out at the end. No Dashboards
+ * menu since 2026-11-17: dashboards are cards on Member Resources.
  */
 
 .mh-member-bar {
@@ -198,24 +199,6 @@
   display: none;
 }
 
-.mh-member-bar__caret {
-  font-size: 0.7rem;
-  opacity: 0.8;
-}
-
-.mh-member-bar__item-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  white-space: normal;
-}
-
-.mh-member-bar__item-text small {
-  color: var(--mh-color-neutral-600, #616161);
-  font-size: 0.8rem;
-  font-weight: 400;
-}
-
 /* Name → My Membership; the actions beside it (log out, switch back) show
    an icon only, with the label kept for screen readers and the tooltip. */
 .mh-member-bar__me {
@@ -252,7 +235,7 @@
   text-overflow: ellipsis;
 }
 
-/* Dashboards dropdown. */
+/* The phone name menu (a <details>). */
 .mh-member-bar__drop {
   position: relative;
 }
@@ -269,34 +252,12 @@
   background: var(--mhb-panel-bg);
   color: var(--mhb-panel-fg);
   box-shadow: var(--mh-shadow-md, 0 6px 20px rgb(19 19 20 / 0.12));
-  /* A manager's list runs to ~16 dashboards: scroll inside the panel rather
-     than past the bottom of the screen. dvh, not vh: on phones vh includes
-     the space under the browser's toolbars. */
+  /* Scroll inside the panel rather than past the bottom of the screen. dvh,
+     not vh: on phones vh includes the space under the browser's toolbars. */
   max-height: calc(100vh - 4.5rem);
   max-height: calc(100dvh - 4.5rem);
   overflow-y: auto;
   overscroll-behavior: contain;
-}
-
-/* Dashboards is the long list (a manager's runs to ~16 entries, each with a
-   description): wide enough that most descriptions fit on one line. */
-.mh-member-bar__dashboards .mh-member-bar__panel {
-  width: 24rem;
-}
-
-.mh-member-bar__group {
-  padding: 0.5rem 0.6rem 0.2rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--mh-color-neutral-600, #5c5f66);
-}
-
-.mh-member-bar__group:not(:first-child) {
-  margin-top: 0.35rem;
-  border-top: 1px solid var(--mhb-border);
-  padding-top: 0.6rem;
 }
 
 .mh-member-bar__panel a {
@@ -340,36 +301,8 @@
   white-space: nowrap;
 }
 
-/* Dashboards keeps its word when the other labels go: a bare gauge icon is
-   not findable, and the staff sidebar points here by name (2026-10-23). */
-.mh-member-bar.is-compact .mh-member-bar__dashboards .mh-member-bar__label {
-  position: static;
-  width: auto;
-  height: auto;
-  overflow: visible;
-  clip: auto;
-}
-
 .mh-member-bar.is-crowded .mh-member-bar__logo {
   display: none;
-}
-
-/* "Show me": a link to #mh-dashboards opens the menu and rings the button. */
-.mh-member-bar__dashboards.is-pointed > summary {
-  animation: mh-member-bar-point 0.9s ease-in-out 3;
-  box-shadow: 0 0 0 3px var(--mhb-gold);
-}
-
-@keyframes mh-member-bar-point {
-  50% {
-    box-shadow: 0 0 0 7px var(--mhb-gold);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mh-member-bar__dashboards.is-pointed > summary {
-    animation: none;
-  }
 }
 
 /* The name menu exists for phones only; desktop keeps separate buttons
@@ -382,7 +315,7 @@
   /* Phones: the name, Public Website and Log out fold into one menu under
      the member's first name, so the bar says who is signed in and every
      remaining control is recognisable (2026-11-03). Switch back stays out
-     in the open while masquerading. */
+     in the open while masquerading, as a gold icon. */
   .mh-member-bar__me-menu {
     display: block;
   }
@@ -404,7 +337,7 @@
     display: none;
   }
 
-  /* Like Dashboards: the panel spans the bar rather than hanging off the
+  /* The panel spans the bar rather than hanging off the
      button, so it never pushes past the screen edge. */
   .mh-member-bar .mh-member-bar__me-menu {
     position: static;
@@ -434,7 +367,6 @@
   .mh-member-bar__primary,
   .mh-member-bar__name,
   .mh-member-bar__search,
-  .mh-member-bar__caret,
   .mh-member-bar .mh-member-bar__label {
     display: none;
   }
@@ -443,9 +375,8 @@
     display: inline-flex;
   }
 
-  /* The dashboards panel spans the bar instead of hanging off its button. */
-  .mh-member-bar__inner,
-  .mh-member-bar__dashboards {
+  /* The name menu's panel spans the bar instead of hanging off its button. */
+  .mh-member-bar__inner {
     position: static;
   }
 
@@ -454,14 +385,6 @@
     right: 0.5rem;
     width: auto;
     top: calc(100% + 0.25rem);
-  }
-
-  /* Phones: titles only, two to a row, so the whole list fits on one screen
-     (with descriptions a manager's list ran three screens long). */
-  .mh-member-bar__list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-    gap: 0.125rem;
   }
 
   .mh-member-bar__panel a {
@@ -475,13 +398,20 @@
     margin-top: 0;
   }
 
-  .mh-member-bar__item-text small {
-    display: none;
+  /* Switch back keeps its gold but loses its words, so a masquerading
+     staff member's bar still fits a 390px screen (it ran to 469px and the
+     whole page scrolled sideways). It is also in the name menu. */
+  .mh-member-bar .mh-member-bar__action[href*="unmasquerade"] .mh-member-bar__action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
   }
 }
 
 /* Small phones: the button keeps its gold and its words; the end group
-   tightens so Dashboards, search, Public Website, the name and Log out
+   tightens so search, Public Website, the name and Log out
    still fit on a 390px screen. */
 @container mhbar (max-width: 440px) {
   .mh-member-bar__inner {

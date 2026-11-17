@@ -26,9 +26,15 @@ use Drupal\user\Entity\User;
  *
  * The bar renders in the member (Gin) theme only. The public site already has
  * its own header, navigation and search, so there a logged-in member gets a
- * gold "Member Resources" button and the Dashboards menu in the header's red
- * top strip (buildPublicReturn()) instead of a second bar and a second search
- * box (JR 2026-10-13; Dashboards added 2026-11-10).
+ * gold "Member Resources" button in the header's red top strip
+ * (buildPublicReturn()) instead of a second bar and a second search box
+ * (JR 2026-10-13).
+ *
+ * Neither carries a Dashboards menu any more. Staff asked for one place
+ * members go (2026-11-17): the dashboards are cards on Member Resources,
+ * under its search box, and the search finds them. The menu was in the bar
+ * from 2026-10-06 and in the public strip from 2026-11-10; staff found the
+ * bar too busy with it and the dashboards listed twice.
  *
  * Its links come from three menus so staff can reorder or disable them
  * without code:
@@ -36,7 +42,8 @@ use Drupal\user\Entity\User;
  * - member-nav: optional extra links beside Member Resources (empty since the
  *   Make / Learn / Connect / Grow dropdowns left the bar; the Member
  *   Resources page lists those journeys in full).
- * - your-dashboards: one entry per role hub, shown as a "Dashboards" menu.
+ * - your-dashboards: one entry per role hub. Not read here: Member Resources
+ *   shows it as cards (RoleMenuCardsBlock) and the staff sidebar lists it.
  * - member-account: the buttons beside the viewer's name (switch back,
  *   log out). The name itself opens My Membership.
  *
@@ -118,7 +125,7 @@ class MemberBar implements TrustedCallbackInterface {
   /**
    * Lazy builder: the public theme's way back to the member side.
    *
-   * The gold button, the Dashboards menu, who is signed in, and Log out (plus "Switch back" while
+   * The gold button, who is signed in, and Log out (plus "Switch back" while
    * staff masquerade). Members on phones could not tell they were signed in
    * on public pages, and the only Log out was an unlabelled icon on member
    * pages (facilitators and members, 2026-11-03): visitors see "Join | Log
@@ -129,7 +136,6 @@ class MemberBar implements TrustedCallbackInterface {
       'contexts' => ['user', 'session.is_masquerading'],
       'tags' => [
         'config:system.menu.member-account',
-        'config:system.menu.your-dashboards',
         'user:' . $this->currentUser->id(),
       ],
     ];
@@ -140,10 +146,6 @@ class MemberBar implements TrustedCallbackInterface {
     return [
       '#theme' => 'makerspace_user_links_member_return',
       '#home_url' => Url::fromRoute('entity.node.canonical', ['node' => self::HUB_NID])->toString(),
-      // The same Dashboards menu the member bar carries: without it a
-      // facilitator or instructor on a public page saw no dashboards at all
-      // and had to know to open Member Resources first (staff, 2026-11-10).
-      '#dashboards' => $this->links('your-dashboards', '', FALSE),
       '#account' => $this->links('member-account'),
       '#display_name' => $full,
       '#first_name' => $first,
@@ -162,7 +164,6 @@ class MemberBar implements TrustedCallbackInterface {
       'tags' => [
         'config:system.menu.member-nav',
         'config:system.menu.member-account',
-        'config:system.menu.your-dashboards',
       ],
     ];
     if (!self::shows($this->currentUser)) {
@@ -182,10 +183,10 @@ class MemberBar implements TrustedCallbackInterface {
       '#site_url' => Url::fromRoute('<front>')->toString(),
       '#logo_url' => $this->logoUrl(),
       // The bar's search box submits to the Member Resources index, whose
-      // type-to-filter box (makerspace_member_navigator) reads ?q.
+      // type-to-filter box (makerspace_member_navigator) reads ?q. On phones
+      // the box is an icon; #find takes it to the filter with the cursor in.
       '#search_url' => $hub_url,
       '#primary' => $this->links('member-nav', $current, FALSE),
-      '#dashboards' => $this->links('your-dashboards', $current, FALSE),
       '#account' => $this->links('member-account', $current, FALSE),
       '#display_name' => $names[0],
       '#first_name' => $names[1],
@@ -247,7 +248,7 @@ class MemberBar implements TrustedCallbackInterface {
    *
    * With $recurse, two levels deep: a parent that points nowhere
    * (`<nolink>`) and has no reachable children is dropped. The bar itself
-   * renders top-level links only (no dropdowns besides Dashboards).
+   * renders top-level links only (no dropdowns).
    *
    * @return array
    *   A list of links, each keyed title, description, url (empty for
