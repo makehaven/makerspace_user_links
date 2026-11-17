@@ -320,11 +320,36 @@
     display: block;
   }
 
+  /* The first name is what gives way when the bar is short of room (a
+     masquerading bar ran to 407px, so 390px phones still scrolled sideways,
+     Lior 2026-11-17): it truncates, down to the person icon and chevron. */
+  .mh-member-bar__start {
+    flex: none;
+  }
+
+  .mh-member-bar__end,
+  .mh-member-bar__me-menu {
+    min-width: 0;
+  }
+
+  .mh-member-bar__end > * {
+    flex: none;
+  }
+
+  .mh-member-bar__end > .mh-member-bar__me-menu {
+    flex: 0 1 auto;
+  }
+
   .mh-member-bar__me-menu > summary {
-    max-width: 9rem;
+    max-width: min(9rem, 100%);
+  }
+
+  .mh-member-bar__me-menu > summary > .bi {
+    flex: none;
   }
 
   .mh-member-bar__first {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
