@@ -45,3 +45,8 @@ services:
       - '@messenger'
     tags:
       - { name: event_subscriber }
+
+  makerspace_user_links.social_login_destination:
+    class: Drupal\makerspace_user_links\EventSubscriber\SocialLoginDestination
+    tags:
+      - { name: event_subscriber }
