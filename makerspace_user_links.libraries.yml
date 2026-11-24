@@ -60,3 +60,10 @@ member_index:
       css/member-index.css: {}
   dependencies:
     - makerspace_user_links/bootstrap_icons
+
+assigned_to_me:
+  # Bump on every CSS change: the aggregate filename ignores file contents.
+  version: '1.0'
+  css:
+    theme:
+      css/assigned-to-me.css: {}

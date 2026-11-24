@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\makerspace_user_links\AssignedActivities;
 
+use Drupal\Core\Url;
+use Civi\Api4\Contact;
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -71,12 +73,13 @@ class AssignedActivities {
    *   Maximum rows.
    *
    * @return array[]
-   *   Rows with id, subject, date, type, overdue, targets (names), source
-   *   (name), target_id and url.
+   *   Rows with id, subject, details, type, type_id, date, overdue, targets
+   *   (names), source (name), status, target_id, url (CiviCRM) and list_url
+   *   (the task's card on /assigned-to-me).
    */
   public function open(int $contactId, ?array $ids = NULL, int $limit = 200): array {
     $get = Activity::get(FALSE)
-      ->addSelect('id', 'subject', 'details', 'activity_date_time', 'activity_type_id', 'activity_type_id:label')
+      ->addSelect('id', 'subject', 'details', 'activity_date_time', 'activity_type_id', 'activity_type_id:label', 'status_id:label')
       ->addWhere('assignee_contact_id', 'CONTAINS', $contactId)
       ->addWhere('status_id', 'IN', $this->openStatuses())
       ->addWhere('is_deleted', '=', FALSE)
@@ -123,6 +126,9 @@ class AssignedActivities {
         'overdue' => $date !== '' && strtotime($date) < $now,
         'targets' => array_values($targets),
         'source' => (string) (reset($source) ?: ''),
+        'status' => (string) ($activity['status_id:label'] ?? ''),
+        'target_id' => $cid ? (int) $cid : NULL,
+        'list_url' => self::listUrl((int) $id),
         'url' => $this->url((int) $id, $cid),
       ];
     }
@@ -146,6 +152,102 @@ class AssignedActivities {
       'open' => $base()->execute()->countMatched(),
       'overdue' => $base()->addWhere('activity_date_time', '<', date('Y-m-d H:i:s', \Drupal::time()->getRequestTime()))->execute()->countMatched(),
     ];
+  }
+
+  /**
+   * Email, phone and mailing address of a contact, for the task card.
+   *
+   * @return array
+   *   Keys email, phone, address (lines).
+   */
+  public function contactCard(int $contactId): array {
+    $contact = Contact::get(FALSE)
+      ->addSelect(
+        'email_primary.email',
+        'phone_primary.phone',
+        'address_primary.street_address',
+        'address_primary.supplemental_address_1',
+        'address_primary.supplemental_address_2',
+        'address_primary.city',
+        'address_primary.state_province_id:abbr',
+        'address_primary.postal_code',
+      )
+      ->addWhere('id', '=', $contactId)
+      ->execute()
+      ->first() ?? [];
+    $address = [];
+    foreach (['street_address', 'supplemental_address_1', 'supplemental_address_2', 'city', 'postal_code'] as $key) {
+      $address[$key] = $contact['address_primary.' . $key] ?? '';
+    }
+    $address['state'] = $contact['address_primary.state_province_id:abbr'] ?? '';
+    return [
+      'email' => trim((string) ($contact['email_primary.email'] ?? '')),
+      'phone' => trim((string) ($contact['phone_primary.phone'] ?? '')),
+      'address' => TaskActions::addressLines($address),
+    ];
+  }
+
+  /**
+   * Whether an open activity is assigned to a contact.
+   */
+  public function isAssignedTo(int $activityId, int $contactId): bool {
+    return Activity::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $activityId)
+      ->addWhere('assignee_contact_id', 'CONTAINS', $contactId)
+      ->addWhere('is_deleted', '=', FALSE)
+      ->execute()
+      ->countMatched() > 0;
+  }
+
+  /**
+   * Applies a one-click action and optional note to an activity.
+   *
+   * @param int $activityId
+   *   The activity; the caller has checked it is assigned to the actor.
+   * @param string $action
+   *   A key of TaskActions::actions().
+   * @param string $note
+   *   Plain-text note, may be empty.
+   * @param string $actor
+   *   Name to sign the note with.
+   *
+   * @return bool
+   *   TRUE when the task left the open list.
+   */
+  public function act(int $activityId, string $action, string $note, string $actor): bool {
+    $spec = TaskActions::actions()[$action] ?? NULL;
+    if ($spec === NULL) {
+      throw new \InvalidArgumentException('Unknown action ' . $action);
+    }
+    $now = \Drupal::time()->getRequestTime();
+    $current = Activity::get(FALSE)
+      ->addSelect('details')
+      ->addWhere('id', '=', $activityId)
+      ->execute()
+      ->first();
+    $details = (string) ($current['details'] ?? '');
+    $details = TaskActions::appendNote($details, TaskActions::historyLine($action, $note), $actor, $now);
+
+    $update = Activity::update(FALSE)
+      ->addWhere('id', '=', $activityId)
+      ->addValue('details', $details);
+    if ($spec['status'] !== NULL) {
+      $update->addValue('status_id:name', $spec['status']);
+    }
+    if ($action === 'snooze') {
+      $update->addValue('activity_date_time', TaskActions::snoozeDate($now));
+    }
+    $update->execute();
+    return (bool) $spec['closes'];
+  }
+
+  /**
+   * Absolute link to a task's card on /assigned-to-me.
+   */
+  public static function listUrl(int $activityId): string {
+    $options = ['absolute' => TRUE, 'fragment' => 'task-' . $activityId];
+    return Url::fromRoute('makerspace_user_links.assigned_to_me', [], $options)->toString();
   }
 
   /**

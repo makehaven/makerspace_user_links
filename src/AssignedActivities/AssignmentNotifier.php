@@ -9,6 +9,7 @@ use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Emails staff when an open CiviCRM activity is assigned to them.
@@ -98,6 +99,33 @@ class AssignmentNotifier {
     $quietTypes = array_map('intval', (array) $settings->get('do_not_notify_assignees_for'));
     $actor = $this->activities->contactId($this->currentUser);
 
+    // This runs at shutdown, after the request has left the stack, and
+    // building the email's absolute links needs one: without it every notice
+    // failed with "getBasePath() on null" (live 2026-10-26 and 11-23; no
+    // notice was ever logged as sent). Stand in a request for the base URL.
+    $stack = \Drupal::requestStack();
+    $pushed = FALSE;
+    if (!$stack->getCurrentRequest()) {
+      $stack->push(Request::create(($GLOBALS['base_url'] ?? '') ?: 'https://www.makehaven.org'));
+      $pushed = TRUE;
+    }
+
+    $sent = 0;
+    try {
+      $sent = $this->notifyAll($pending, $actor, $quietTypes);
+    }
+    finally {
+      if ($pushed) {
+        $stack->pop();
+      }
+    }
+    return $sent;
+  }
+
+  /**
+   * Emails each pending assignee; failures are logged per person.
+   */
+  protected function notifyAll(array $pending, ?int $actor, array $quietTypes): int {
     $sent = 0;
     foreach ($pending as $contactId => $ids) {
       // Assigning yourself needs no email; CiviCRM's form already sent one.
@@ -180,11 +208,11 @@ class AssignmentNotifier {
         $lines[] = '';
         $lines[] = $excerpt;
       }
-      $lines[] = 'Open it: ' . $row['url'];
+      $lines[] = 'Open it: ' . ($row['list_url'] ?? $row['url']);
     }
     $lines[] = '';
     $lines[] = 'Everything open and assigned to you: ' . $params['list_url'];
-    $lines[] = 'It stays on that list until you mark it Completed in CiviCRM.';
+    $lines[] = 'Mark it Done, Waiting on them or Not needed, or add a note, right on that list.';
     $message['body'][] = implode("\n", $lines);
   }
 

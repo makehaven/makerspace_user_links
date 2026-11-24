@@ -1,0 +1,87 @@
+/* /assigned-to-me task cards (Kate, 2026-11-24). */
+.mh-tasks {
+  display: grid;
+  gap: 1rem;
+  max-width: 52rem;
+}
+.mh-tasks__intro {
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+.mh-tasks__help {
+  color: var(--mh-color-text-muted, #555);
+  max-width: 52rem;
+}
+.mh-task {
+  border: 1px solid var(--mh-color-border, #ddd);
+  border-left: 4px solid var(--mh-color-border, #ddd);
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  background: var(--mh-color-surface, #fff);
+}
+.mh-task--overdue {
+  border-left-color: var(--mh-color-brand-primary, #8b1919);
+}
+.mh-task:target {
+  box-shadow: 0 0 0 3px var(--mh-color-accent-gold, #f0c419);
+}
+.mh-task__meta {
+  font-size: 0.85rem;
+  color: var(--mh-color-text-muted, #555);
+}
+.mh-task__flag {
+  color: var(--mh-color-brand-primary, #8b1919);
+  font-weight: 700;
+}
+.mh-task__status {
+  font-weight: 600;
+}
+.mh-task__title {
+  font-size: 1.1rem;
+  margin: 0.2rem 0 0.6rem;
+}
+.mh-task__who {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 0.6rem;
+  overflow-wrap: anywhere;
+}
+.mh-task__address {
+  margin-top: 0.35rem;
+}
+.mh-task__address address {
+  margin: 0;
+  font-style: normal;
+  user-select: all;
+}
+.mh-task__label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--mh-color-text-muted, #555);
+}
+.mh-task__source {
+  font-size: 0.85rem;
+  color: var(--mh-color-text-muted, #555);
+}
+.mh-task__details {
+  margin: 0.4rem 0 0.6rem;
+}
+.mh-task__links {
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+.mh-task__form .form-item {
+  margin: 0 0 0.5rem;
+}
+.mh-task__form textarea {
+  width: 100%;
+}
+.mh-task__form .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+}
+.mh-task__btn {
+  margin: 0 !important;
+}

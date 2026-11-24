@@ -811,3 +811,13 @@ function makerspace_user_links_mail(string $key, array &$message, array $params)
     AssignmentNotifier::message($message, $params);
   }
 }
+
+/**
+ * Implements hook_gin_ignore_sticky_form_actions().
+ *
+ * Each task card on /assigned-to-me is its own small form; Gin would lift the
+ * first card's buttons into its sticky header.
+ */
+function makerspace_user_links_gin_ignore_sticky_form_actions(): array {
+  return ['makerspace_user_links.assigned_to_me'];
+}
