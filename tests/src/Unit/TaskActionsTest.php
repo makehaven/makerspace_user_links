@@ -69,6 +69,16 @@ class TaskActionsTest extends UnitTestCase {
   }
 
   /**
+   * Only giving follow-up tasks point at a gift.
+   */
+  public function testGiftId(): void {
+    $this->assertSame(5163, TaskActions::giftId('makerspace_donor_thanks', 5163));
+    $this->assertSame(77, TaskActions::giftId('makerspace_tribute_notice', 77));
+    $this->assertSame(0, TaskActions::giftId('Meeting', 5163));
+    $this->assertSame(0, TaskActions::giftId('makerspace_donor_thanks', 0));
+  }
+
+  /**
    * Snooze lands three days out at 9am.
    */
   public function testSnoozeDate(): void {

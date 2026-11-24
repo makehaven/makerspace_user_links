@@ -6,6 +6,7 @@ namespace Drupal\makerspace_user_links\Controller;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
 use Drupal\makerspace_user_links\AssignedActivities\AssignedActivities;
 use Drupal\makerspace_user_links\AssignedActivities\TaskActions;
 use Drupal\makerspace_user_links\Form\AssignedTaskForm;
@@ -133,12 +134,29 @@ class AssignedToMeController extends ControllerBase {
     if ($mailto = TaskActions::mailto($contact['email'], $title)) {
       $links[] = '<a class="mh-task__reply" href="' . htmlspecialchars($mailto, ENT_QUOTES) . '">' . $this->t('Reply by email') . '</a>';
     }
+    if (($giftId = TaskActions::giftId($row['type_name'], $row['source_record_id'])) && $this->receiptAvailable()) {
+      $receipt = Url::fromRoute('makerspace_sponsorship.gift_receipt', ['contribution' => $giftId])->toString();
+      $links[] = '<a class="mh-task__receipt" target="_blank" rel="noopener" href="' . htmlspecialchars($receipt, ENT_QUOTES) . '">' . $this->t('Print receipt') . '</a>';
+    }
     $links[] = '<a class="mh-task__civi" href="' . htmlspecialchars($row['url'], ENT_QUOTES) . '">' . $this->t('Open in CiviCRM') . '</a>';
     $card['links'] = ['#markup' => '<div class="mh-task__links">' . implode(' · ', $links) . '</div>'];
 
     $form = $this->classResolver()->getInstanceFromDefinition(AssignedTaskForm::class)->setActivityId($row['id']);
     $card['form'] = $this->formBuilder()->getForm($form, $row['id']);
     return $card;
+  }
+
+  /**
+   * Whether the gift receipt page exists and this viewer may open it.
+   */
+  protected function receiptAvailable(): bool {
+    static $available = NULL;
+    if ($available === NULL) {
+      $available = $this->moduleHandler()->moduleExists('makerspace_sponsorship')
+        && $this->currentUser()->hasPermission('access CiviContribute')
+        && count(\Drupal::service('router.route_provider')->getRoutesByNames(['makerspace_sponsorship.gift_receipt'])) > 0;
+    }
+    return $available;
   }
 
   /**

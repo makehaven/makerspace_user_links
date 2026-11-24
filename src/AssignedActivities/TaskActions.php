@@ -124,6 +124,21 @@ final class TaskActions {
   }
 
   /**
+   * Activity types whose source record is a contribution (a gift).
+   *
+   * Written by makerspace_sponsorship's giving follow-ups; their cards link
+   * to the gift's printable receipt (Kate, 2026-11-24).
+   */
+  public const GIFT_TYPES = ['makerspace_donor_thanks', 'makerspace_tribute_notice'];
+
+  /**
+   * The contribution a task is about, or 0.
+   */
+  public static function giftId(string $typeName, int $sourceRecordId): int {
+    return in_array($typeName, self::GIFT_TYPES, TRUE) && $sourceRecordId > 0 ? $sourceRecordId : 0;
+  }
+
+  /**
    * A mailto: link that replies about the task, or '' without an email.
    */
   public static function mailto(string $email, string $subject): string {

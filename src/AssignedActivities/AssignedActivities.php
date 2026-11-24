@@ -79,7 +79,7 @@ class AssignedActivities {
    */
   public function open(int $contactId, ?array $ids = NULL, int $limit = 200): array {
     $get = Activity::get(FALSE)
-      ->addSelect('id', 'subject', 'details', 'activity_date_time', 'activity_type_id', 'activity_type_id:label', 'status_id:label')
+      ->addSelect('id', 'subject', 'details', 'activity_date_time', 'activity_type_id', 'activity_type_id:label', 'activity_type_id:name', 'status_id:label', 'source_record_id')
       ->addWhere('assignee_contact_id', 'CONTAINS', $contactId)
       ->addWhere('status_id', 'IN', $this->openStatuses())
       ->addWhere('is_deleted', '=', FALSE)
@@ -127,6 +127,8 @@ class AssignedActivities {
         'targets' => array_values($targets),
         'source' => (string) (reset($source) ?: ''),
         'status' => (string) ($activity['status_id:label'] ?? ''),
+        'type_name' => (string) ($activity['activity_type_id:name'] ?? ''),
+        'source_record_id' => (int) ($activity['source_record_id'] ?? 0),
         'target_id' => $cid ? (int) $cid : NULL,
         'list_url' => self::listUrl((int) $id),
         'url' => $this->url((int) $id, $cid),
